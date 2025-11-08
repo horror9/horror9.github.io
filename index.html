@@ -1,0 +1,302 @@
+　<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>逮捕状管理ポータル（デモ）</title>
+
+  <!-- IMPORTANT: 実運用では厳格な CSP をサーバー側で設定すること -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+
+  <style>
+    /* 簡潔で読みやすいスタイル（実運用はデザインに合わせて） */
+    body { font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Arial; background:#f4f6f8; margin:0; color:#111; }
+    header { background:#0b5; padding:18px; color:#012; display:flex; align-items:center; justify-content:space-between; }
+    h1 { margin:0; font-size:1.1rem; }
+    .container { padding:20px; max-width:1100px; margin:20px auto; }
+    .card { background:#fff; padding:16px; border-radius:8px; box-shadow:0 1px 4px rgba(10,10,10,0.06); margin-bottom:16px; }
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+    input, select, button, textarea { font:inherit; padding:8px 10px; border-radius:6px; border:1px solid #ddd; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; font-size:0.95rem; }
+    th { background:#fafafa; color:#333; }
+    .muted { color:#666; font-size:0.9rem; }
+    .btn { background:#0b5; color:#012; border:none; cursor:pointer; }
+    .btn.secondary { background:#eee; color:#111; }
+    .right { margin-left:auto; }
+    .modal { position:fixed; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); }
+    .modal .panel { width:700px; max-width:95%; background:#fff; border-radius:8px; padding:18px; }
+    .hidden { display:none; }
+    .tag { display:inline-block; padding:4px 8px; border-radius:12px; background:#eef; font-size:0.85rem; }
+    footer { text-align:center; color:#777; font-size:0.85rem; padding:12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>逮捕状管理ポータル（Demo）</h1>
+    <div class="muted">ログイン状態: <strong id="loginState">未認証</strong></div>
+  </header>
+
+  <main class="container">
+    <!-- 認証は必ずサーバー側で行うこと。フロント側のモックに過ぎない -->
+    <div class="card" id="loginCard">
+      <h2>職員ログイン（デモ）</h2>
+      <p class="muted">実運用ではID連携（例：SAML / OIDC）、多要素認証、ハードウェアトークンを必須にしてください。</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <input id="username" placeholder="職員ID" />
+        <input id="password" placeholder="パスワード" type="password" />
+        <button class="btn" id="loginBtn">ログイン</button>
+      </div>
+    </div>
+
+    <div id="app" class="hidden">
+      <div class="card">
+        <div style="display:flex; align-items:center;">
+          <div>
+            <strong id="userName">職員: 山田一郎（例）</strong><br />
+            <span class="muted">権限: 管理者</span>
+          </div>
+          <div class="right">
+            <button class="btn secondary" id="logoutBtn">ログアウト</button>
+          </div>
+        </div>
+      </div>
+
+      <section class="card" aria-labelledby="warrantListTitle">
+        <h2 id="warrantListTitle">逮捕状一覧</h2>
+
+        <div class="toolbar">
+          <input id="search" placeholder="氏名・事案ID・発行日で検索" style="min-width:260px;" />
+          <select id="statusFilter">
+            <option value="">すべてのステータス</option>
+            <option value="issued">発行済</option>
+            <option value="executed">執行済</option>
+            <option value="cancelled">取消</option>
+          </select>
+          <button class="btn" id="newWarrantBtn">新規逮捕状作成</button>
+          <button class="btn secondary" id="exportBtn">CSVエクスポート</button>
+        </div>
+
+        <table id="warrantTable" aria-describedby="warrantListTitle">
+          <thead>
+            <tr>
+              <th>事案ID</th>
+              <th>氏名（仮名）</th>
+              <th>発行日</th>
+              <th>ステータス</th>
+              <th>担当</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h3>監査ログ（直近）</h3>
+        <ul id="auditLog" style="margin:0; padding-left:18px;"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="muted">注意: このサンプルは教育目的。実運用では必ず法令準拠の取り扱いと暗号化・監査の実装が必要。</footer>
+
+  <!-- モーダル: 逮捕状詳細 / 作成 -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="panel">
+      <h3 id="modalTitle">逮捕状詳細</h3>
+      <div id="modalBody"></div>
+      <div style="text-align:right; margin-top:12px;">
+        <button class="btn secondary" id="closeModalBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* --- ダミーデータ（実運用ではサーバーAPIを呼ぶ） --- */
+    const demoData = [
+      { id: "A-2025-0001", name: "山田 太郎", issued: "2025-10-01", status: "issued", officer: "田中" },
+      { id: "A-2025-0002", name: "佐藤 花子", issued: "2025-09-20", status: "executed", officer: "佐々木" },
+      { id: "A-2025-0003", name: "鈴木 次郎", issued: "2025-08-15", status: "cancelled", officer: "高橋" },
+    ];
+
+    /* --- 重要な注記（必ず守ること） ---
+       1) 認証/認可はサーバーで行う（例: OIDC, SAML）。フロントでパスワードを検証してはダメ。
+       2) センシティブなデータは送信時・保管時ともにTLS/強力な暗号(AES-256等)で暗号化する。
+       3) 監査ログは改ざん防止（WORMストレージや署名付きログ）で保存すること。
+       4) CSRF、XSS対策、入力検証、ファイル検査をサーバー側で実装すること。
+       5) ロールベースアクセス制御（RBAC）を厳密に行うこと。
+    */
+
+    // UI 要素
+    const loginCard = document.getElementById('loginCard');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const app = document.getElementById('app');
+    const loginState = document.getElementById('loginState');
+    const userName = document.getElementById('userName');
+    const warrantTableBody = document.querySelector('#warrantTable tbody');
+    const searchInput = document.getElementById('search');
+    const statusFilter = document.getElementById('statusFilter');
+    const newWarrantBtn = document.getElementById('newWarrantBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const auditLog = document.getElementById('auditLog');
+
+    // 簡易ログ（実運用は監査用APIに記録）
+    const logs = [];
+
+    function addLog(text) {
+      const time = new Date().toISOString();
+      logs.unshift({time, text});
+      renderLogs();
+      // 実運用: ここで監査APIにPOST（認可済みの職員トークン利用）
+    }
+    function renderLogs() {
+      auditLog.innerHTML = logs.slice(0,10).map(l => `<li>${l.time} — ${escapeHtml(l.text)}</li>`).join('');
+    }
+
+    // テーブル描画
+    function renderTable(data) {
+      warrantTableBody.innerHTML = data.map(w => {
+        return `<tr>
+          <td>${escapeHtml(w.id)}</td>
+          <td>${escapeHtml(w.name)}</td>
+          <td>${escapeHtml(w.issued)}</td>
+          <td><span class="tag">${escapeHtml(w.status)}</span></td>
+          <td>${escapeHtml(w.officer)}</td>
+          <td>
+            <button class="btn" data-action="view" data-id="${escapeHtml(w.id)}">表示</button>
+            <button class="btn secondary" data-action="download" data-id="${escapeHtml(w.id)}">PDF</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    // 検索・フィルタ処理（クライアントサイド・デモ）
+    function applyFilters() {
+      const q = searchInput.value.trim().toLowerCase();
+      const status = statusFilter.value;
+      let data = demoData.slice();
+      if (status) data = data.filter(d => d.status === status);
+      if (q) data = data.filter(d =>
+        d.id.toLowerCase().includes(q) ||
+        d.name.toLowerCase().includes(q) ||
+        d.issued.toLowerCase().includes(q)
+      );
+      renderTable(data);
+    }
+
+    // イベント: テーブルの操作ボタン
+    document.querySelector('#warrantTable').addEventListener('click', (ev) => {
+      const btn = ev.target.closest('button');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      const record = demoData.find(r => r.id === id);
+      if (action === 'view') {
+        openModal(record);
+        addLog(`逮捕状表示: ${id}`);
+      } else if (action === 'download') {
+        // 実運用: PDF生成はサーバーで行い、認可済みトークンでダウンロードさせること
+        alert('PDFダウンロード（デモ）。実運用ではサーバー側で生成して下さい。');
+        addLog(`PDFダウンロード要求: ${id}`);
+      }
+    });
+
+    function openModal(record) {
+      modalTitle.textContent = `逮捕状詳細 - ${record.id}`;
+      modalBody.innerHTML = `
+        <p><strong>氏名:</strong> ${escapeHtml(record.name)}</p>
+        <p><strong>発行日:</strong> ${escapeHtml(record.issued)}</p>
+        <p><strong>ステータス:</strong> ${escapeHtml(record.status)}</p>
+        <p><strong>担当:</strong> ${escapeHtml(record.officer)}</p>
+        <hr />
+        <p class="muted">ここに逮捕状本文、証拠添付、法的メモ等が表示されます（機密）。</p>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    closeModalBtn.addEventListener('click', () => { modal.classList.add('hidden'); });
+
+    // サンプル: CSVエクスポート（権限がある職員のみ）
+    exportBtn.addEventListener('click', () => {
+      // 実運用: サーバー側でアクセス制御・監査・暗号を行い、ログを記録すること
+      const csv = demoData.map(r => `${r.id},${r.name},${r.issued},${r.status},${r.officer}`).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'warrants_export.csv'; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      addLog('CSVエクスポート実行');
+    });
+
+    // 新規逮捕状（クライアント側デモ）
+    newWarrantBtn.addEventListener('click', () => {
+      modalTitle.textContent = '新規逮捕状作成（デモ）';
+      modalBody.innerHTML = `
+        <form id="newForm">
+          <label>事案ID: <input name="id" required /></label><br/><br/>
+          <label>氏名: <input name="name" required /></label><br/><br/>
+          <label>発行日: <input name="issued" type="date" required /></label><br/><br/>
+          <label>担当: <input name="officer" required /></label><br/><br/>
+          <label>備考:<br/><textarea name="note" rows="4"></textarea></label><br/>
+          <div style="text-align:right; margin-top:8px;"><button class="btn" type="submit">作成</button></div>
+        </form>
+      `;
+      modal.classList.remove('hidden');
+
+      document.getElementById('newForm').addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const newRec = {
+          id: fd.get('id'),
+          name: fd.get('name'),
+          issued: fd.get('issued'),
+          status: 'issued',
+          officer: fd.get('officer')
+        };
+        // 実運用: ここは必ずサーバーAPIへPOSTし、サーバー側で検証・監査を行う
+        demoData.unshift(newRec);
+        applyFilters();
+        addLog(`逮捕状作成: ${newRec.id}`);
+        modal.classList.add('hidden');
+      }, { once: true });
+    });
+
+    // シンプルな「ログイン」動作（デモ）
+    loginBtn.addEventListener('click', () => {
+      // 実運用ではここでパスワード検証を行わない。サーバーに送ってIDトークンを受け取る。
+      const u = document.getElementById('username').value || 'demo.officer';
+      loginCard.classList.add('hidden');
+      app.classList.remove('hidden');
+      loginState.textContent = '認証済み';
+      userName.textContent = `職員: ${u}（例デモ）`;
+      addLog(`ログイン: ${u}`);
+      applyFilters();
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      loginCard.classList.remove('hidden');
+      app.classList.add('hidden');
+      loginState.textContent = '未認証';
+      addLog('ログアウト');
+    });
+
+    // フィルタ/検索イベント
+    searchInput.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+
+    // 初期描画
+    renderTable(demoData);
+    renderLogs();
+  </script>
+</body>
+</html>
