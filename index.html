@@ -3,300 +3,377 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>絶対見てはいけないページ</title>
-  <meta name="description" content="夜の館で何者かがあなたを見つめている…。足音も、影も、逃げ場もない恐怖の世界へようこそ。">
-  <meta name="google-site-verification" content="4U4miU3Gsc0UAXRYGq5Y5ezYuwDvyN93D19iR8COO4E" />
+<title>NeonMail - ローカルメールクローン</title>
 <style>
   :root{
-    --bg:#060608;
-    --fg:#d6d6d8;
-    --accent:#9b2b2b;
+    --bg:#07101a;
+    --panel:#071824;
+    --muted:#8aa0b3;
+    --accent1:#00f0ff;
+    --accent2:#ff3dd1;
+    --glass: rgba(255,255,255,0.03);
+    --radius:10px;
+    font-family: Inter, ui-sans-serif, system-ui, "Helvetica Neue", Arial;
   }
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:var(--bg);color:var(--fg);}
-  .center{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
-  .card{max-width:700px;padding:32px;text-align:center;border-radius:12px;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:0 6px 30px rgba(0,0,0,0.6);}
-  h1{margin:0 0 6px 0;font-size:28px;letter-spacing:0.6px}
-  p{margin:0;color: #bdbec0}
-  button{appearance:none;padding:12px 20px;border-radius:10px;border:2px solid rgba(255,255,255,0.06);background:transparent;color:var(--fg);cursor:pointer;font-weight:600}
-  button#start{font-size:18px;padding:14px 28px;background:linear-gradient(90deg,#111 0%, #222 100%);border-color:rgba(155,43,43,0.9)}
-  .hidden{display:none}
-  /* creepy text area */
-  #crawl{width:100%;height:220px;overflow:hidden;border-radius:8px;padding:18px;text-align:left;background:rgba(0,0,0,0.35);box-shadow:inset 0 0 60px rgba(0,0,0,0.6);font-family: "Courier New", Courier, monospace;line-height:1.6;font-size:15px;color:#d6d6d8}
-  /* full-screen scare overlay */
-  #scareOverlay{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:999;opacity:0;pointer-events:none;transition:opacity 220ms ease;
-  }
-  #scareOverlay.show{opacity:1;pointer-events:auto;}
-  /* scary SVG face */
-  .face{
-    width:70vmin;max-width:980px;transform:scale(0.8);transition:transform 220ms cubic-bezier(.2,.9,.3,1);
-    filter: drop-shadow(0 30px 40px rgba(0,0,0,0.7));
-  }
-  .face.big{transform:scale(1.05) rotate(-2deg);}
-  /* calm button */
-  .calm{
-    position:fixed;right:18px;bottom:18px;z-index:1100;padding:10px 14px;border-radius:8px;background:#111;color:var(--fg);border:1px solid rgba(255,255,255,0.04);cursor:pointer;
-  }
-  /* subtle pulsing shadow behind face */
-  .pulse {
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    z-index:998;pointer-events:none;
-  }
-  .pulse::before{
-    content:"";width:60vmin;height:60vmin;border-radius:50%;background:radial-gradient(circle, rgba(155,43,43,0.07), rgba(0,0,0,0));
-    transform:scale(0.8);opacity:0;transition:opacity 600ms ease; z-index:997;
-  }
-  #scareOverlay.show .pulse::before{opacity:1;transform:scale(1);}
-  /* small text flicker (not flashing) */
-  .whisper{opacity:0.04;font-size:14px;margin-top:10px}
-  @media (max-width:600px){
-    .card{padding:20px}
-    .face{width:92vmin}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#02050a 0%,var(--bg) 100%);color:#d7e6ef}
+  .app{display:grid;grid-template-columns:280px 420px 1fr;gap:18px;padding:18px;height:100vh;box-sizing:border-box}
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);padding:14px;backdrop-filter: blur(6px);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+  /* Sidebar */
+  .sidebar{display:flex;flex-direction:column;gap:12px}
+  .brand{font-weight:700;letter-spacing:1px;font-size:18px;color:var(--accent1);display:flex;align-items:center;gap:8px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(90deg,var(--accent1),var(--accent2));box-shadow:0 0 12px rgba(0,240,255,0.25)}
+  .controls{display:flex;gap:8px}
+  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+  .btn.primary{border-color:transparent;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#021018;font-weight:700}
+  .search input{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted)}
+  .folders{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .folder{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
+  .folder.active{background:rgba(255,255,255,0.02);color:#eaf8ff}
+  .count{background:linear-gradient(90deg,var(--accent2),var(--accent1));padding:4px 8px;border-radius:20px;font-size:12px;color:#021018}
+  /* List */
+  .list{height:calc(100vh - 140px);overflow:auto}
+  .mail-item{display:flex;gap:10px;padding:10px;border-radius:8px;align-items:flex-start;cursor:pointer}
+  .mail-item:hover{background:rgba(255,255,255,0.01)}
+  .avatar{width:44px;height:44px;border-radius:8px;background:linear-gradient(180deg,#0a2230,#06202b);display:flex;align-items:center;justify-content:center;font-weight:700}
+  .meta{flex:1;min-width:0}
+  .meta .head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .from{font-weight:700}
+  .subject{color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .snippet{color:rgba(200,220,240,0.45);font-size:13px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .time{font-size:12px;color:rgba(200,220,240,0.45)}
+  .unread{background:var(--accent1);padding:4px 6px;border-radius:12px;color:#021018;font-weight:700;font-size:12px}
+  /* Reader */
+  .reader{display:flex;flex-direction:column;gap:10px;height:calc(100vh - 36px);overflow:auto}
+  .read-head{display:flex;justify-content:space-between;align-items:center}
+  .read-sub{font-size:18px;font-weight:700}
+  .read-from{color:var(--muted);font-size:13px}
+  .read-body{background:var(--glass);padding:12px;border-radius:8px;color:#dbeeff;line-height:1.6;white-space:pre-wrap}
+  /* Compose modal */
+  .modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:720px;max-width:96%;z-index:60;box-shadow:0 30px 80px rgba(0,0,0,0.7)}
+  .modal .form{display:flex;flex-direction:column;gap:8px;padding:14px}
+  .form input, .form textarea{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:10px;border-radius:6px;color:var(--muted)}
+  .form textarea{min-height:180px;resize:vertical}
+  .overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.6),rgba(0,0,0,0.7));z-index:50}
+  /* Footer small */
+  .hint{font-size:12px;color:rgba(200,220,240,0.35)}
+  @media (max-width:980px){
+    .app{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}
+    .list{height:240px}
+    .reader{height:auto}
   }
 </style>
 </head>
 <body>
-<div class="center">
-  <div class="card" id="introCard">
-    <h1>ここは安全な実験場…のはず</h1>
-    <p>クリックで始まります。音が出ます。心臓が弱いならやめて。怖がらせたいって言った君が悪い。</p>
-    <div style="height:18px"></div>
-    <button id="start">START — Enter the room</button>
-    <div style="height:18px"></div>
-    <div id="crawl" aria-live="polite"></div>
-    <div class="whisper">ヒント: じっと待っていると何かが近づくかも。</div>
+<div class="app">
+  <div class="panel sidebar">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="brand"><div class="dot"></div>NeonMail</div>
+      <div class="hint">demo · local</div>
+    </div>
+
+    <div class="controls">
+      <button id="composeBtn" class="btn primary">Compose</button>
+      <button id="refreshBtn" class="btn">Refresh</button>
+    </div>
+
+    <div class="search"><input id="searchInput" placeholder="Search sender / subject / body"></div>
+
+    <div class="folders" id="folders">
+      <!-- folders injected -->
+    </div>
+
+    <div style="margin-top:auto;font-size:12px;color:var(--muted)">
+      <div>Neon UI. ローカルストレージ使用。</div>
+      <div style="margin-top:8px">Rain. Data flow. 少しだけ破片。</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-weight:700">Inbox</div>
+      <div class="hint" id="listInfo"></div>
+    </div>
+
+    <div class="list" id="mailList">
+      <!-- emails injected -->
+    </div>
+  </div>
+
+  <div class="panel reader" id="readerPane">
+    <div class="read-empty" id="readPlaceholder" style="opacity:0.7">
+      <div style="font-size:20px;font-weight:700;color:var(--accent2)">メッセージを開いてください</div>
+      <div class="hint" style="margin-top:8px">左のリストから選択。Composeでメールを生成。動作は全部ローカル。</div>
+    </div>
+    <div id="readContent" style="display:none">
+      <div class="read-head">
+        <div>
+          <div class="read-sub" id="readSubject">Subject</div>
+          <div class="read-from" id="readFrom">From • when</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="replyBtn" class="btn">Reply</button>
+          <button id="markBtn" class="btn">Mark Read/Unread</button>
+          <button id="moveBtn" class="btn">Delete</button>
+        </div>
+      </div>
+      <div class="read-body" id="readBody">Body</div>
+    </div>
   </div>
 </div>
 
-<!-- overlay that will show the face -->
-<div id="scareOverlay" role="dialog" aria-hidden="true">
-  <div class="pulse"></div>
-  <!-- SVG is original, non-graphic -->
-  <svg class="face" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <radialGradient id="g" cx="50%" cy="40%" r="60%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="0.9"/>
-        <stop offset="45%" stop-color="#f2eaeb" stop-opacity="0.6"/>
-        <stop offset="100%" stop-color="#6a0b0b" stop-opacity="0.95"/>
-      </radialGradient>
-    </defs>
-    <rect width="800" height="800" rx="40" fill="url(#g)"/>
-    <!-- eyes -->
-    <g transform="translate(0,60)">
-      <ellipse cx="260" cy="320" rx="70" ry="110" fill="#060608"/>
-      <ellipse cx="540" cy="320" rx="70" ry="110" fill="#060608"/>
-      <circle cx="260" cy="360" r="18" fill="#fff"/>
-      <circle cx="540" cy="360" r="18" fill="#fff"/>
-    </g>
-    <!-- mouth -->
-    <path d="M220 520 C310 630, 490 630, 580 520 C500 600, 300 600, 220 520 Z" fill="#060608"/>
-    <!-- subtle cracks -->
-    <g stroke="#3a0a0a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
-      <path d="M160 180 C220 220,200 300,240 340"/>
-      <path d="M640 180 C580 220,600 300,560 340"/>
-      <path d="M340 120 C360 200,420 200,460 120"/>
-    </g>
-  </svg>
+<!-- modal template -->
+<div id="modalRoot" style="display:none">
+  <div class="overlay"></div>
+  <div class="modal panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-weight:700">Compose</div>
+      <div style="display:flex;gap:8px">
+        <button id="sendBtn" class="btn primary">Send</button>
+        <button id="closeModalBtn" class="btn">Close</button>
+      </div>
+    </div>
+    <div class="form">
+      <input id="toField" placeholder="To (email)">
+      <input id="subjectField" placeholder="Subject">
+      <textarea id="bodyField" placeholder="Write your message..."></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="hint">すべてローカル。送信はエミュレート。</div>
+        <div id="composeStatus" class="hint"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<button class="calm hidden" id="calmBtn">CALM — STOP</button>
-
 <script>
-/*
-  シンプルな「怖がらせ」演出。
-  - ユーザークリックで開始（ブラウザの自動再生ブロック回避）
-  - 背景の低音ハムをWebAudioでじわっと上げる
-  - テキストがゆっくり表示され、最後にジャンプスケア（視覚＋音）
-  - CALMボタンで即停止（音をフェードアウトし、オーバーレイ消去）
+/* NeonMail - client-only mail UI clone
+   機能: Inbox / Sent / Trash / Compose / Read / Reply / Move to Trash / Search / localStorage
 */
 
-const startBtn = document.getElementById('start');
-const crawl = document.getElementById('crawl');
-const overlay = document.getElementById('scareOverlay');
-const face = document.querySelector('.face');
-const calm = document.getElementById('calmBtn');
+const STORAGE_KEY = 'neonmail.messages.v1';
 
-let audioCtx, masterGain, humOsc, noiseNode;
-let scareTimeouts = [];
-let started = false;
+const SAMPLE = [
+  { id: genId(), folder:'inbox', from:'alice@corp.neon', to:'you@local', subject:'Welcome to NeonGrid', body:'街は光る。君はログインした。\nここではデータが雨のように落ちる。', ts: Date.now()-1000*60*60*24, read:false },
+  { id: genId(), folder:'inbox', from:'build@chronos', to:'you@local', subject:'Deployment scheduled', body:'デプロイ完了予定: 3:00 JST\nチェックリスト:\n- マigrations\n- Canary', ts: Date.now()-1000*60*90, read:false },
+  { id: genId(), folder:'sent', from:'you@local', to:'nora@arc', subject:'Re: Lights', body:'受け取りました。明日確認します。', ts: Date.now()-1000*60*60*6, read:true },
+];
 
-function safeRandom(min,max){ return Math.random()*(max-min)+min; }
+function genId(){ return 'm_'+Date.now()+'_'+Math.floor(Math.random()*10000) }
 
-function appendLine(text, delay=0){
-  const t = setTimeout(()=> {
-    // typewriter effect
-    let i=0;
-    const lineEl = document.createElement('div');
-    crawl.appendChild(lineEl);
-    const ti = setInterval(()=>{
-      lineEl.textContent += text[i]||'';
-      i++;
-      if(i>text.length) clearInterval(ti);
-      crawl.scrollTop = crawl.scrollHeight;
-    }, 18);
-  }, delay);
-  scareTimeouts.push(t);
+function loadMessages(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE)); return SAMPLE.slice(); }
+    return JSON.parse(raw);
+  } catch(e){ console.error(e); localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE)); return SAMPLE.slice(); }
+}
+function saveMessages(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)) }
+
+let M = loadMessages();
+let state = { folder:'inbox', query:'', currentId:null };
+
+const foldersMeta = [
+  {id:'inbox', label:'Inbox'},
+  {id:'sent', label:'Sent'},
+  {id:'trash', label:'Trash'}
+];
+
+const el = id => document.getElementById(id);
+const mailList = el('mailList');
+const foldersRoot = el('folders');
+const searchInput = el('searchInput');
+const readPlaceholder = el('readPlaceholder');
+const readContent = el('readContent');
+const readSubject = el('readSubject');
+const readFrom = el('readFrom');
+const readBody = el('readBody');
+const listInfo = el('listInfo');
+
+function init(){
+  renderFolders();
+  renderList();
+  attachEvents();
+  updateCounts();
 }
 
-function makeAudio(){
-  if(audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.0001; // near silent start
-  masterGain.connect(audioCtx.destination);
+function updateCounts(){
+  const unread = M.filter(m=>m.folder==='inbox' && !m.read).length;
+  // update folder counts
+  const sv = document.querySelectorAll('.folder');
+  sv.forEach(node=>{
+    const id = node.dataset.id;
+    const count = M.filter(m=>m.folder===id && (id!=='sent')).length;
+    const unreadCount = M.filter(m=>m.folder==='inbox' && !m.read).length;
+    if(id==='inbox') node.querySelector('.count').textContent = unreadCount;
+    else node.querySelector('.count').textContent = count;
+  });
+}
 
-  // low rumble
-  humOsc = audioCtx.createOscillator();
-  humOsc.type = 'sine';
-  humOsc.frequency.value = 55; // low bass
-  const humGain = audioCtx.createGain();
-  humGain.gain.value = 0.0;
-  humOsc.connect(humGain).connect(masterGain);
-  humOsc.start();
+function renderFolders(){
+  foldersRoot.innerHTML = '';
+  foldersMeta.forEach(f=>{
+    const div = document.createElement('div');
+    div.className = 'folder' + (state.folder===f.id ? ' active' : '');
+    div.dataset.id = f.id;
+    div.innerHTML = `<div>${f.label}</div><div class="count">0</div>`;
+    div.onclick = ()=>{ state.folder = f.id; state.currentId = null; renderFolders(); renderList(); renderReader(); }
+    foldersRoot.appendChild(div);
+  });
+  updateCounts();
+}
 
-  // noise source for texture (not too harsh)
-  const bufferSize = 2*audioCtx.sampleRate;
-  const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    output[i] = (Math.random()*2-1) * 0.4;
+function formatTime(ts){
+  const d = new Date(ts);
+  const now = Date.now();
+  const diff = now - ts;
+  if(diff < 1000*60*60*24) {
+    return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  } else {
+    return d.toLocaleDateString();
   }
-  noiseNode = audioCtx.createBufferSource();
-  noiseNode.buffer = noiseBuffer;
-  noiseNode.loop = true;
-  const noiseFilter = audioCtx.createBiquadFilter();
-  noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.value = 1200;
-  const noiseGain = audioCtx.createGain();
-  noiseGain.gain.value = 0.0;
-  noiseNode.connect(noiseFilter).connect(noiseGain).connect(masterGain);
-  noiseNode.start();
 }
 
-function rampGainTo(value, timeMs){
-  const now = audioCtx.currentTime;
-  masterGain.gain.cancelScheduledValues(now);
-  masterGain.gain.linearRampToValueAtTime(value, now + timeMs/1000);
+function renderList(){
+  const q = state.query.trim().toLowerCase();
+  const list = M
+    .filter(m => m.folder === state.folder)
+    .filter(m => {
+      if(!q) return true;
+      return (m.subject+m.from+m.body+m.to).toLowerCase().includes(q);
+    })
+    .sort((a,b)=>b.ts - a.ts);
+
+  mailList.innerHTML = '';
+  list.forEach(m=>{
+    const item = document.createElement('div');
+    item.className = 'mail-item';
+    item.dataset.id = m.id;
+    item.innerHTML = `
+      <div class="avatar">${m.from.split('@')[0].slice(0,2).toUpperCase()}</div>
+      <div class="meta">
+        <div class="head">
+          <div style="min-width:0">
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="from">${m.from}</div>
+              <div class="time">${formatTime(m.ts)}</div>
+            </div>
+            <div class="subject">${m.subject}</div>
+          </div>
+          ${!m.read && m.folder==='inbox' ? '<div class="unread">NEW</div>' : ''}
+        </div>
+        <div class="snippet">${m.body.slice(0,120)}</div>
+      </div>
+    `;
+    item.onclick = ()=>{ openMessage(m.id) };
+    mailList.appendChild(item);
+  });
+
+  listInfo.textContent = `${list.length} 件`;
+  updateCounts();
 }
 
-function playScream(){
-  // build a short "scream" from filtered noise + high oscillator chirp
-  const now = audioCtx.currentTime;
-  // high chirp
-  const osc = audioCtx.createOscillator();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(300, now);
-  osc.frequency.exponentialRampToValueAtTime(1600, now + 0.25);
-  const ogain = audioCtx.createGain();
-  ogain.gain.setValueAtTime(0.001, now);
-  ogain.gain.exponentialRampToValueAtTime(0.4, now + 0.04);
-  ogain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-  osc.connect(ogain).connect(masterGain);
-  osc.start(now);
-  osc.stop(now + 0.5);
-
-  // short burst of filtered noise
-  const burst = audioCtx.createBufferSource();
-  const bruf = audioCtx.createBuffer(1, audioCtx.sampleRate*1, audioCtx.sampleRate);
-  const out = bruf.getChannelData(0);
-  for(let i=0;i<out.length;i++) out[i] = (Math.random()*2-1);
-  surge = audioCtx.createBiquadFilter();
-  surge.type = 'bandpass';
-  surge.frequency.value = 900;
-  const sg = audioCtx.createGain();
-  sg.gain.setValueAtTime(0.001, now);
-  sg.gain.exponentialRampToValueAtTime(0.6, now + 0.02);
-  sg.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-  burst.buffer = bruf;
-  burst.connect(surge).connect(sg).connect(masterGain);
-  burst.start(now);
-  burst.stop(now + 0.45);
+function openMessage(id){
+  const msg = M.find(x=>x.id===id);
+  if(!msg) return;
+  state.currentId = id;
+  // mark read
+  if(!msg.read){ msg.read = true; saveMessages(M); renderList(); updateCounts(); }
+  readSubject.textContent = msg.subject || '(no subject)';
+  readFrom.textContent = `${msg.from} ・ ${new Date(msg.ts).toLocaleString()}`;
+  readBody.textContent = msg.body;
+  readPlaceholder.style.display = 'none';
+  readContent.style.display = 'block';
 }
 
-function doScareSequence(){
-  overlay.setAttribute('aria-hidden','false');
-  overlay.classList.add('show');
-  calm.classList.remove('hidden');
-  // small scale animation
-  setTimeout(()=>face.classList.add('big'), 60);
-
-  // lift ambient to noticeable level then trigger scream
-  rampGainTo(0.06, 400); // gentle rise
-  // timing for jump-scare
-  setTimeout(()=> {
-    playScream();
-    // quick grow effect
-    face.classList.add('big');
-    setTimeout(()=> face.classList.remove('big'), 900);
-  }, 1400);
+function renderReader(){
+  if(!state.currentId){ readPlaceholder.style.display = 'block'; readContent.style.display = 'none'; return; }
+  openMessage(state.currentId);
 }
 
-function stopAll(){
-  // clear timeouts
-  scareTimeouts.forEach(t=>clearTimeout(t));
-  scareTimeouts = [];
-  // hide overlay
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
-  face.classList.remove('big');
-  // fade out sound
-  if(masterGain){
-    const now = audioCtx.currentTime;
-    masterGain.gain.cancelScheduledValues(now);
-    masterGain.gain.linearRampToValueAtTime(0.0001, now + 0.25);
+/* Compose modal */
+function openCompose(prefill={}){
+  const root = el('modalRoot');
+  root.style.display = 'block';
+  el('toField').value = prefill.to || '';
+  el('subjectField').value = prefill.subject || '';
+  el('bodyField').value = prefill.body || '';
+  el('composeStatus').textContent = '';
+}
+
+function closeCompose(){
+  el('modalRoot').style.display = 'none';
+}
+
+function sendCompose(){
+  const to = el('toField').value.trim();
+  const subj = el('subjectField').value.trim();
+  const body = el('bodyField').value.trim();
+  if(!to || !body){ el('composeStatus').textContent = 'To と本文は必須'; return; }
+  const msg = { id:genId(), folder:'sent', from:'you@local', to, subject:subj||'(no subject)', body, ts:Date.now(), read:true };
+  M.push(msg);
+  // simulate delivering to recipient as an inbox item (demo)
+  const incoming = { id:genId(), folder:'inbox', from: to, to:'you@local', subject: 'Delivered: ' + (subj||'(no subject)'), body: `エコー: ${body}\n\n-- delivered (simulated)`, ts:Date.now(), read:false };
+  M.push(incoming);
+  saveMessages(M);
+  closeCompose();
+  // refresh UI
+  renderFolders();
+  renderList();
+  renderReader();
+}
+
+/* Reply / Delete / Mark */
+function replyCurrent(){
+  const cur = M.find(m=>m.id===state.currentId);
+  if(!cur) return;
+  openCompose({ to: cur.from, subject: (cur.subject.startsWith('Re:') ? cur.subject : 'Re: '+cur.subject), body: `\n\n--- original ---\n${cur.body}`});
+}
+function markToggle(){
+  const cur = M.find(m=>m.id===state.currentId);
+  if(!cur) return;
+  cur.read = !cur.read;
+  saveMessages(M);
+  renderList();
+  renderReader();
+}
+function moveCurrent(){
+  const cur = M.find(m=>m.id===state.currentId);
+  if(!cur) return;
+  if(cur.folder === 'trash'){
+    // permanent delete
+    M = M.filter(x=>x.id !== cur.id);
+    state.currentId = null;
+  } else {
+    cur.folder = 'trash';
+    state.currentId = null;
   }
-  calm.classList.add('hidden');
+  saveMessages(M);
+  renderFolders();
+  renderList();
+  renderReader();
 }
 
-// main start
-startBtn.addEventListener('click', async ()=> {
-  if(started) return;
-  started = true;
-  startBtn.disabled = true;
-  // create audio context on user gesture
-  makeAudio();
+/* Attach events */
+function attachEvents(){
+  el('composeBtn').onclick = ()=>openCompose({});
+  el('closeModalBtn').onclick = closeCompose;
+  el('sendBtn').onclick = sendCompose;
+  el('refreshBtn').onclick = ()=>{ M = loadMessages(); renderList(); renderFolders(); renderReader(); };
+  el('replyBtn').onclick = replyCurrent;
+  el('markBtn').onclick = markToggle;
+  el('moveBtn').onclick = moveCurrent;
 
-  // small ambient fade-in
-  rampGainTo(0.002, 350);
-  // populate creepy text progressively
-  appendLine("ドアが…軋んだ。", 400);
-  appendLine("君は中を覗き込む。空気が冷たい。", 1600);
-  appendLine("何かが肩越しに息をした気がする。", 4000);
-  appendLine("振り向くほど勇気があるか？", 7200);
-  appendLine("…君はまだ座っている。", 10200);
-  appendLine("静かに、近づく。", 13000);
-  appendLine("もうすぐだ。", 16300);
+  searchInput.oninput = (e)=>{ state.query = e.target.value; renderList(); };
 
-  // small increase in rumble as tension
-  setTimeout(()=> {
-    if(audioCtx) rampGainTo(0.02, 1000);
-  }, 11000);
+  // keyboard shortcuts (simple)
+  window.addEventListener('keydown', (ev)=>{
+    if(ev.key==='c' && (ev.ctrlKey || ev.metaKey)){ ev.preventDefault(); openCompose({}); }
+    if(ev.key==='r' && (ev.ctrlKey || ev.metaKey)){ ev.preventDefault(); M = loadMessages(); renderList(); renderFolders(); }
+  });
+}
 
-  // final lines then scare
-  setTimeout(()=> {
-    appendLine("…見て。", 0);
-  }, 16600);
+/* initialize */
+init();
 
-  // trigger final scare shortly after
-  setTimeout(()=> {
-    doScareSequence();
-  }, 17800);
-});
-
-// calm button
-calm.addEventListener('click', ()=> {
-  stopAll();
-});
-
-// also allow clicking overlay to stop
-overlay.addEventListener('click', ()=> {
-  stopAll();
-});
-
-// safety: stop audio if user leaves page
-window.addEventListener('pagehide', ()=> {
-  if(audioCtx) audioCtx.close && audioCtx.close();
-});
 </script>
 </body>
 </html>
