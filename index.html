@@ -3,481 +3,273 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Neon Match-3 — Drag 修正版</title>
+<title>Lock Screen — iPhone風デモ（パスコード付き）</title>
 <style>
   :root{
-    --cols: 8;
-    --rows: 8;
-    --tile-size: 64px;
-    --gap: 8px;
-    --bg: #071226;
+    --bg1:#0f1724; --bg2:#0b1220; --accent:rgba(255,255,255,0.95);
+    --glass:rgba(255,255,255,0.06); --glass-2:rgba(255,255,255,0.08);
+    --screen-w:390px; --screen-h:844px;
   }
-  html,body{height:100%;margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto;}
-  body{
-    background:
-      radial-gradient(ellipse at 20% 10%, rgba(0,120,255,0.08), transparent 10%),
-      linear-gradient(180deg,#041024 0%, #061428 60%, #071226 100%);
-    color:#cfe6ff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px;
-  }
-
-  .shell{
-    width: calc(var(--cols) * (var(--tile-size) + var(--gap)) - var(--gap));
-    padding:20px;
-    border-radius:14px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    box-shadow: 0 10px 40px rgba(2,8,20,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-    position:relative;
-  }
-
-  .hud{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
-    gap:12px;
-  }
-  .score{
-    font-size:14px;
-    opacity:0.9;
-    padding:6px 10px;
-    border-radius:8px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    box-shadow: 0 2px 8px rgba(0,0,0,0.45);
-  }
-
-  .board{
-    position:relative;
-    width:100%;
-    height: calc(var(--rows) * (var(--tile-size) + var(--gap)) - var(--gap));
-    user-select:none;
-    touch-action: none;
-    perspective:800px;
-  }
-
-  .tile{
-    position:absolute;
-    width:var(--tile-size);
-    height:var(--tile-size);
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    color:rgba(255,255,255,0.95);
-    box-shadow:
-      0 8px 18px rgba(2,8,30,0.6),
-      0 2px 6px rgba(0,0,0,0.5),
-      inset 0 1px 0 rgba(255,255,255,0.06);
-    transition: transform 220ms cubic-bezier(.2,.9,.2,1), left 220ms linear, top 220ms linear, opacity 220ms linear;
-    transform-origin:center;
-    will-change: transform, left, top, opacity;
-    cursor:grab;
-  }
-  .tile:active{ cursor:grabbing; transform: scale(0.98) rotateX(6deg); }
-
-  /* soft glow variants */
-  .type-0{ background: linear-gradient(180deg,#ff9aa2, #ff6b8a); box-shadow: 0 8px 30px rgba(255,107,138,0.18), 0 0 18px rgba(255,107,138,0.12) }
-  .type-1{ background: linear-gradient(180deg,#ffd59e,#ffb86b); box-shadow: 0 8px 30px rgba(255,184,107,0.14), 0 0 18px rgba(255,184,107,0.10) }
-  .type-2{ background: linear-gradient(180deg,#b6f3ff,#6fe2ff); box-shadow: 0 8px 30px rgba(111,226,255,0.14), 0 0 18px rgba(111,226,255,0.10) }
-  .type-3{ background: linear-gradient(180deg,#c6d1ff,#96a6ff); box-shadow: 0 8px 30px rgba(150,166,255,0.14), 0 0 18px rgba(150,166,255,0.10) }
-  .type-4{ background: linear-gradient(180deg,#9affd6,#4bffb0); box-shadow: 0 8px 30px rgba(75,255,176,0.14), 0 0 18px rgba(75,255,176,0.10) }
-  .type-5{ background: linear-gradient(180deg,#ffd9ff,#ff9bff); box-shadow: 0 8px 30px rgba(255,155,255,0.12), 0 0 18px rgba(255,155,255,0.08) }
-
-  .dragging{
-    z-index:999;
-    transform: scale(1.06) translateZ(32px);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.7);
-    transition: none;
-    opacity:0.98;
-  }
-
-  .match{
-    filter: saturate(1.1) brightness(1.06);
-    transform: scale(1.04);
-  }
-
-  .removed{
-    transform: scale(0.28);
-    opacity:0;
-    transition: transform 260ms cubic-bezier(.2,.9,.2,1), opacity 200ms linear;
-  }
-
-  .hint { font-size:12px; opacity:0.75; text-align:center; margin-top:8px; color:#9db6ff }
-  @media (max-width:520px){
-    :root{ --tile-size: calc((100vw - 64px) / var(--cols)); }
-    .shell{ padding:12px; }
-  }
+  html,body{height:100%;margin:0;font-family:-apple-system, "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));display:flex;align-items:center;justify-content:center;color:var(--accent);-webkit-font-smoothing:antialiased;}
+  .device{width:calc(var(--screen-w) * 0.9);max-width:420px;aspect-ratio:390/844;border-radius:34px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.06));box-shadow:0 20px 80px rgba(0,0,0,0.6);position:relative;touch-action:none}
+  .wallpaper{position:absolute;inset:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(255,80,120,0.08), transparent 10%), radial-gradient(900px 500px at 90% 80%, rgba(80,160,255,0.06), transparent 10%), linear-gradient(180deg,#071029 0%, #0b1220 100%);filter:blur(0.6px) saturate(1.05);transform:scale(1.02);z-index:0}
+  .screen{position:relative;z-index:1;height:100%;padding:28px 18px 18px 18px;display:flex;flex-direction:column;justify-content:space-between}
+  .status{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,0.85);font-size:13px}
+  .time{margin-top:20px;text-align:center}
+  .time .hhmm{font-size:72px;line-height:0.9;font-weight:600;letter-spacing:-2px;text-shadow:0 6px 18px rgba(0,0,0,0.6)}
+  .time .date{margin-top:6px;font-size:18px;opacity:0.9}
+  .notifs{margin-top:28px;display:flex;flex-direction:column;gap:12px;padding:0 22px}
+  .notif{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.4), inset 0 1px rgba(255,255,255,0.02);display:flex;gap:12px;align-items:flex-start;backdrop-filter:blur(6px) saturate(1.1)}
+  .notif .app{width:40px;height:40px;border-radius:10px;background:var(--glass-2);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);flex-shrink:0}
+  .notif .content{font-size:14px;line-height:1.3;color:rgba(255,255,255,0.95)}
+  .small{font-size:12px;opacity:0.85;margin-top:6px;color:rgba(255,255,255,0.75)}
+  .bottom{display:flex;align-items:center;justify-content:space-between;padding:14px 18px}
+  .action-btn{width:56px;height:56px;border-radius:28px;display:flex;align-items:center;justify-content:center;background:var(--glass);box-shadow:0 6px 20px rgba(0,0,0,0.45);font-size:18px;user-select:none}
+  .grab{margin:0 auto;width:160px;text-align:center;position:relative;pointer-events:none}
+  .swipe-bar{height:6px;width:78px;margin:0 auto 8px;border-radius:6px;background:linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));box-shadow:0 3px 8px rgba(0,0,0,0.6) inset}
+  .swipe-hint{font-size:13px;opacity:0.9;pointer-events:none}
+  .home{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6));color:white;font-size:20px;transform:translateY(20px);opacity:0;transition:all 420ms cubic-bezier(.2,.9,.3,1)}
+  .home.show{opacity:1;transform:translateY(0)}
+  /* パスコードモーダル */
+  .pass-modal{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6))}
+  .pass-panel{width:86%;max-width:360px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:18px;padding:18px;text-align:center;color:var(--accent);box-shadow:0 12px 40px rgba(0,0,0,0.6)}
+  .pass-title{font-size:18px;margin-bottom:8px}
+  .dots{display:flex;gap:12px;justify-content:center;margin:14px 0 6px}
+  .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.12);box-shadow:inset 0 1px rgba(255,255,255,0.02)}
+  .dot.filled{background:var(--accent)}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .key{padding:14px 0;border-radius:10px;background:var(--glass);font-size:18px;user-select:none}
+  .key:active{transform:scale(0.98)}
+  .pass-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .cancel{background:transparent;border:none;color:rgba(255,255,255,0.85);font-size:14px}
+  .shake{animation:shake 540ms}
+  @keyframes shake{10%{transform:translateX(-10px)}30%{transform:translateX(10px)}50%{transform:translateX(-6px)}70%{transform:translateX(4px)}90%{transform:translateX(-2px)}100%{transform:translateX(0)}}
+  @media (max-width:420px){.time .hhmm{font-size:56px}}
 </style>
 </head>
 <body>
-  <div class="shell" id="shell">
-    <div class="hud">
-      <div class="score">SCORE: <span id="score">0</span></div>
-      <div class="score">MOVES: <span id="moves">0</span></div>
+  <div class="device" id="device">
+    <div class="wallpaper" id="wallpaper"></div>
+
+    <div class="screen" id="screen">
+      <div>
+        <div class="status">
+          <div class="left"><div id="carrier">docomo</div></div>
+          <div class="right"><div id="wifi">Wi-Fi</div><div id="battery">🔋 <span id="batText">--%</span></div></div>
+        </div>
+
+        <div class="time" aria-live="polite">
+          <div class="hhmm" id="time">--:--</div>
+          <div class="date" id="date">--</div>
+        </div>
+
+        <div class="notifs" id="notifs">
+          <div class="notif"><div class="app">M</div><div class="content">メッセージ — きょうの待ち合わせは何時にする？ <div class="small">2分前</div></div></div>
+          <div class="notif"><div class="app">T</div><div class="content">Twitter風通知 — だれかがリプライしました。 <div class="small">8分前</div></div></div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="action-btn" id="flash">ライト</div>
+        <div class="grab" id="grabArea"><div class="swipe-bar"></div><div class="swipe-hint">上にスワイプして解除</div></div>
+        <div class="action-btn" id="cam">カメラ</div>
+      </div>
     </div>
 
-    <div class="board" id="board" aria-hidden="false"></div>
-    <div class="hint">ドラッグで隣のピースにスワップ。スワイプ距離で判定。</div>
+    <div class="home" id="home">
+      <div>
+        <div style="font-size:20px;margin-bottom:12px">アンロックされました — ホーム画面風ダミー</div>
+        <button id="relock" style="padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.08);border:none;color:var(--accent);cursor:pointer">再ロック</button>
+      </div>
+    </div>
+
+    <!-- パスコードモーダル -->
+    <div class="pass-modal" id="passModal" aria-hidden="true">
+      <div class="pass-panel" role="dialog" aria-label="パスコード入力">
+        <div class="pass-title">パスコードを入力</div>
+        <div class="dots" id="dots">
+          <div class="dot" data-i="0"></div>
+          <div class="dot" data-i="1"></div>
+          <div class="dot" data-i="2"></div>
+          <div class="dot" data-i="3"></div>
+        </div>
+        <div class="keypad" id="keypad">
+          <!-- 1..9 -->
+          <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+          <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+          <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+          <div class="key" id="empty"></div>
+          <div class="key">0</div>
+          <div class="key" id="del">⌫</div>
+        </div>
+        <div class="pass-row">
+          <button class="cancel" id="cancelPass">キャンセル</button>
+          <div style="font-size:12px;color:rgba(255,255,255,0.65)">4桁の数字</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 <script>
-(() => {
-  const cols = 8, rows = 8;
-  const types = 6;
-  const boardEl = document.getElementById('board');
-  const scoreEl = document.getElementById('score');
-  const movesEl = document.getElementById('moves');
-  let score = 0, moves = 0;
+/* --- 設定: パスコード --- */
+const PASSCODE = '1234'; // デフォルト。ここを書き換えれば変更可能
 
-  function setTileSize(){
-    const shell = document.getElementById('shell');
-    const available = shell.clientWidth - 0;
-    const tileSize = Math.floor((available + 8) / cols - 0);
-    document.documentElement.style.setProperty('--tile-size', tileSize + 'px');
-    document.documentElement.style.setProperty('--cols', cols);
-    document.documentElement.style.setProperty('--rows', rows);
+/* --- 時刻・日付 --- */
+function pad(n){ return n<10 ? '0'+n : n; }
+function updateTime(){
+  const now = new Date();
+  document.getElementById('time').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  const opts = { weekday:'short', month:'short', day:'numeric' };
+  document.getElementById('date').textContent = now.toLocaleDateString('ja-JP', opts);
+}
+updateTime();
+setInterval(updateTime, 1000);
+
+/* --- バッテリー --- */
+if ('getBattery' in navigator){
+  navigator.getBattery().then(bat=>{
+    function refresh(){ document.getElementById('batText').textContent = Math.round(bat.level*100) + '%'; }
+    refresh(); bat.addEventListener('levelchange', refresh);
+  }).catch(()=> document.getElementById('batText').textContent='--%');
+} else { document.getElementById('batText').textContent = '83%'; }
+
+/* --- スワイプでパスコード表示 --- */
+const device = document.getElementById('device');
+const grab = document.getElementById('grabArea');
+const passModal = document.getElementById('passModal');
+const home = document.getElementById('home');
+let startY = null, currentY = 0, showingPass = false;
+const threshold = device.clientHeight * 0.16;
+
+function startDrag(y){
+  startY = y;
+}
+function moveDrag(y){
+  if (startY === null) return;
+  currentY = startY - y;
+  if (currentY < 0) currentY = 0;
+  const pct = Math.min(currentY / threshold, 1);
+  device.style.transform = `translateY(${ -pct * 12 }px) scale(${1 - pct*0.01})`;
+}
+function endDrag(){
+  if (startY === null) return;
+  if (currentY >= threshold && !showingPass){
+    // スワイプ成功 -> パスコードモーダル表示
+    showPassModal();
+  } else {
+    device.style.transition = 'transform 280ms ease';
+    device.style.transform = '';
+    setTimeout(()=> device.style.transition = '', 300);
   }
-  setTileSize();
-  window.addEventListener('resize', setTileSize);
+  startY = null; currentY = 0;
+}
+grab.addEventListener('mousedown', e => startDrag(e.clientY));
+window.addEventListener('mousemove', e => moveDrag(e.clientY));
+window.addEventListener('mouseup', endDrag);
+grab.addEventListener('touchstart', e => startDrag(e.touches[0].clientY), {passive:true});
+window.addEventListener('touchmove', e => moveDrag(e.touches[0].clientY), {passive:true});
+window.addEventListener('touchend', endDrag);
 
-  let board = [];
-  let tilesMap = new Map();
-  let nextId = 1;
+/* --- パスコードロジック --- */
+let input = '';
+const dots = [...document.querySelectorAll('.dot')];
+function updateDots(){
+  dots.forEach((d,i)=> d.classList.toggle('filled', i < input.length));
+}
+function showPassModal(){
+  showingPass = true;
+  passModal.style.display = 'flex';
+  passModal.setAttribute('aria-hidden', 'false');
+  // 軽い視覚効果
+  device.style.transform = 'scale(0.995) translateY(-6px)';
+}
+function hidePassModal(){
+  showingPass = false;
+  passModal.style.display = 'none';
+  passModal.setAttribute('aria-hidden', 'true');
+  device.style.transform = '';
+  input = ''; updateDots();
+}
 
-  const randType = ()=> Math.floor(Math.random()*types);
-  const inBounds=(r,c)=> r>=0 && r<rows && c>=0 && c<cols;
-  function getTileSize(){ return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile-size')) || 64; }
-  function getGap(){ return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gap')) || 8; }
-  function posLeft(c){ return c * (getTileSize() + getGap()); }
-  function posTop(r){ return r * (getTileSize() + getGap()); }
-
-  function generateBoard(){
-    board = Array.from({length:rows}, ()=> Array(cols).fill(null));
-    for(let r=0;r<rows;r++){
-      for(let c=0;c<cols;c++){
-        do {
-          board[r][c] = randType();
-        } while (createsMatchAt(r,c));
-      }
-    }
+/* キーパッド入力 */
+document.getElementById('keypad').addEventListener('click', (e)=>{
+  const key = e.target.closest('.key');
+  if (!key || key.id === 'empty') return;
+  if (key.id === 'del'){
+    input = input.slice(0, -1);
+    updateDots();
+    return;
   }
+  const v = key.textContent.trim();
+  if (!/^\d$/.test(v)) return;
+  if (input.length >= 4) return;
+  input += v;
+  updateDots();
+  if (input.length === 4) verifyPasscode();
+});
 
-  function createsMatchAt(r,c){
-    const t = board[r][c];
-    if (c>=2 && board[r][c-1]===t && board[r][c-2]===t) return true;
-    if (r>=2 && board[r-1][c]===t && board[r-2][c]===t) return true;
-    return false;
+/* 検証 */
+function verifyPasscode(){
+  if (input === PASSCODE){
+    // 成功 -> アンロック
+    passSuccess();
+  } else {
+    passFail();
   }
+}
+function passSuccess(){
+  // アンロック演出
+  hidePassModal();
+  document.getElementById('screen').style.opacity = '0';
+  home.classList.add('show');
+}
+function passFail(){
+  // 失敗: シェイクしてリセット
+  const panel = document.querySelector('.pass-panel');
+  panel.classList.remove('shake');
+  void panel.offsetWidth; // 再トリガーのため
+  panel.classList.add('shake');
+  navigator.vibrate && navigator.vibrate(180); // 振動（対応する端末で）
+  input = ''; updateDots();
+}
 
-  function render(){
-    boardEl.innerHTML = '';
-    tilesMap.clear();
-    for(let r=0;r<rows;r++){
-      for(let c=0;c<cols;c++){
-        const t = board[r][c];
-        const id = nextId++;
-        const el = document.createElement('div');
-        el.className = `tile type-${t}`;
-        el.dataset.r = r; el.dataset.c = c; el.dataset.type = t; el.dataset.id = id;
-        el.style.left = posLeft(c) + 'px';
-        el.style.top  = posTop(r) + 'px';
-        attachPointerHandlers(el);
-        boardEl.appendChild(el);
-        tilesMap.set(String(id), el);
-      }
-    }
-  }
+/* キャンセル */
+document.getElementById('cancelPass').addEventListener('click', ()=>{
+  hidePassModal();
+});
 
-  let dragState = null;
-  function attachPointerHandlers(el){
-    el.addEventListener('pointerdown', onPointerDown);
-  }
-  function onPointerDown(e){
-    e.preventDefault();
-    const target = e.currentTarget;
-    target.setPointerCapture(e.pointerId);
-    dragState = {
-      pointerId: e.pointerId,
-      startEl: target,
-      startR: +target.dataset.r,
-      startC: +target.dataset.c,
-      startX: e.clientX, startY: e.clientY,
-      overEl: null
-    };
-    target.classList.add('dragging');
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-  }
-  function onPointerMove(e){
-    if(!dragState || e.pointerId !== dragState.pointerId) return;
-    const dx = e.clientX - dragState.startX;
-    const dy = e.clientY - dragState.startY;
-    dragState.startEl.style.transform = `translate(${dx}px, ${dy}px) scale(1.04)`;
-    // best-effort highlight (optional)
-    const under = document.elementFromPoint(e.clientX, e.clientY);
-    if(!under) return;
-    const tile = under.closest('.tile');
-    if(tile && tile !== dragState.startEl){
-      const r = +tile.dataset.r, c = +tile.dataset.c;
-      if (isAdjacent(dragState.startR, dragState.startC, r, c)){
-        if (dragState.overEl && dragState.overEl !== tile) dragState.overEl.classList.remove('match');
-        tile.classList.add('match');
-        dragState.overEl = tile;
-      }
-    }
-  }
+/* カメラ・ライト */
+document.getElementById('cam').addEventListener('click', ()=> alert('カメラ起動（ダミー）'));
+document.getElementById('flash').addEventListener('click', ()=> alert('ライト点灯（ダミー）'));
 
-  function onPointerUp(e){
-    if(!dragState || e.pointerId !== dragState.pointerId) return cleanupDrag();
-    const startEl = dragState.startEl;
-    const releaseX = e.clientX, releaseY = e.clientY;
+/* 通知タップ */
+document.getElementById('notifs').addEventListener('click', (e)=>{
+  const n = e.target.closest('.notif');
+  if (!n) return;
+  n.style.transform = 'translateY(-6px)'; n.style.transition = 'transform 200ms';
+  setTimeout(()=> n.style.transform = '', 250);
+});
 
-    // distance-based neighbor selection (安定する方法)
-    const dx = releaseX - dragState.startX;
-    const dy = releaseY - dragState.startY;
-    const absDx = Math.abs(dx), absDy = Math.abs(dy);
-    const tileSize = getTileSize();
-    // 閾値はピクセル or タイルサイズに依存
-    const threshold = Math.max(20, Math.floor(tileSize * 0.28));
+/* 再ロックボタン */
+document.getElementById('relock').addEventListener('click', ()=>{
+  // 簡易的にリセットしてロック状態に戻す
+  document.getElementById('screen').style.opacity = '1';
+  home.classList.remove('show');
+  // 強制的にモーダルを隠す
+  hidePassModal();
+});
 
-    let r2 = dragState.startR;
-    let c2 = dragState.startC;
+/* キーボードで直接入力（デバッグ用）*/
+window.addEventListener('keydown', (e)=>{
+  if (!showingPass) return;
+  if (e.key === 'Backspace'){ input = input.slice(0,-1); updateDots(); }
+  if (/^\d$/.test(e.key) && input.length < 4){ input += e.key; updateDots(); if (input.length===4) verifyPasscode(); }
+  if (e.key === 'Escape') hidePassModal();
+});
 
-    if (absDx < threshold && absDy < threshold) {
-      // ほとんど動いてない -> 何もしない
-    } else {
-      if (absDx > absDy) {
-        // 横方向
-        if (dx > 0) c2 = dragState.startC + 1;
-        else c2 = dragState.startC - 1;
-      } else {
-        // 縦方向
-        if (dy > 0) r2 = dragState.startR + 1;
-        else r2 = dragState.startR - 1;
-      }
-    }
-
-    // reset visual transform immediately
-    startEl.style.transform = '';
-
-    if (r2 !== dragState.startR || c2 !== dragState.startC) {
-      if (inBounds(r2, c2) && isAdjacent(dragState.startR, dragState.startC, r2, c2)) {
-        attemptSwap(dragState.startR, dragState.startC, r2, c2);
-      } else {
-        // out of bounds or not adjacent -> small flash
-        flashTiles([[dragState.startR, dragState.startC]]);
-      }
-    }
-
-    cleanupDrag();
-  }
-  function cleanupDrag(){
-    if(!dragState) return;
-    if(dragState.overEl) dragState.overEl.classList.remove('match');
-    dragState.startEl.classList.remove('dragging');
-    window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('pointerup', onPointerUp);
-    dragState = null;
-  }
-
-  function isAdjacent(r1,c1,r2,c2){
-    return (Math.abs(r1-r2) + Math.abs(c1-c2)) === 1;
-  }
-
-  async function attemptSwap(r1,c1,r2,c2){
-    moves++;
-    movesEl.textContent = moves;
-    swapBoard(r1,c1,r2,c2);
-    await animatePositions();
-    const matches = findMatches();
-    if (matches.length === 0){
-      // revert
-      await sleep(120);
-      swapBoard(r1,c1,r2,c2); // swap back
-      await animatePositions();
-      flashTiles([[r1,c1],[r2,c2]]);
-      return;
-    }
-    await resolveMatchesLoop();
-  }
-
-  function swapBoard(r1,c1,r2,c2){
-    // swap logical board
-    const tmp = board[r1][c1];
-    board[r1][c1] = board[r2][c2];
-    board[r2][c2] = tmp;
-    // swap DOM dataset positions so animatePositions moves the tiles
-    const elA = findTileElAt(r1,c1);
-    const elB = findTileElAt(r2,c2);
-    if (elA && elB){
-      // swap their dataset coordinates
-      elA.dataset.r = r2; elA.dataset.c = c2;
-      elB.dataset.r = r1; elB.dataset.c = c1;
-    } else {
-      // fallback: when missing, re-render
-      // (shouldn't normally happen)
-      render();
-    }
-  }
-
-  function findTileElAt(r,c){
-    for (let el of boardEl.children){
-      if (+el.dataset.r === r && +el.dataset.c === c) return el;
-    }
-    return null;
-  }
-
-  function animatePositions(){
-    return new Promise(resolve => {
-      let toWait = 0;
-      for(let el of boardEl.children){
-        const r = +el.dataset.r, c = +el.dataset.c;
-        const newLeft = posLeft(c), newTop = posTop(r);
-        const curLeft = parseFloat(el.style.left || 0);
-        const curTop  = parseFloat(el.style.top  || 0);
-        if (curLeft !== newLeft || curTop !== newTop) toWait++;
-        el.style.left = newLeft + 'px';
-        el.style.top  = newTop + 'px';
-      }
-      if (toWait === 0) return resolve();
-      let ended = 0;
-      function onEnd(e){ if(e.target && e.target.classList.contains('tile')){ ended++; if(ended>=toWait){ cleanup(); resolve(); }}}
-      function cleanup(){
-        boardEl.removeEventListener('transitionend', onEnd);
-      }
-      boardEl.addEventListener('transitionend', onEnd);
-      setTimeout(()=>{ cleanup(); resolve(); }, 500);
-    });
-  }
-
-  function findMatches(){
-    const matches = [];
-    for(let r=0;r<rows;r++){
-      let runType = null, runStart=0, runLen=0;
-      for(let c=0;c<cols;c++){
-        const t = board[r][c];
-        if (t === runType) runLen++;
-        else {
-          if (runLen >= 3) matches.push({type:runType, cells: Array.from({length:runLen}, (_,i)=>[r, runStart+i])});
-          runType = t; runStart = c; runLen = 1;
-        }
-      }
-      if (runLen >= 3) matches.push({type:runType, cells: Array.from({length:runLen}, (_,i)=>[r, runStart+i])});
-    }
-    for(let c=0;c<cols;c++){
-      let runType = null, runStart=0, runLen=0;
-      for(let r=0;r<rows;r++){
-        const t = board[r][c];
-        if (t === runType) runLen++;
-        else {
-          if (runLen >= 3) matches.push({type:runType, cells: Array.from({length:runLen}, (_,i)=>[runStart+i, c])});
-          runType = t; runStart = r; runLen = 1;
-        }
-      }
-      if (runLen >= 3) matches.push({type:runType, cells: Array.from({length:runLen}, (_,i)=>[runStart+i, c])});
-    }
-    const set = new Set();
-    const uniq = [];
-    for(const m of matches){
-      for(const [r,c] of m.cells){
-        const k = r + ',' + c;
-        if(!set.has(k)){ set.add(k); uniq.push([r,c]); }
-      }
-    }
-    return uniq;
-  }
-
-  async function resolveMatchesLoop(){
-    while(true){
-      const matches = findMatches();
-      if (matches.length === 0) break;
-      for(const [r,c] of matches){
-        const el = findTileElAt(r,c);
-        if (el && !el.classList.contains('removed')){
-          el.classList.add('removed');
-        }
-        board[r][c] = null;
-      }
-      score += matches.length * 10;
-      scoreEl.textContent = score;
-      await sleep(260);
-      collapseColumns();
-      await animatePositions();
-      await sleep(80);
-    }
-  }
-
-  function collapseColumns(){
-    for(let c=0;c<cols;c++){
-      const col = [];
-      for(let r=rows-1;r>=0;r--){
-        if (board[r][c] !== null && board[r][c] !== undefined) col.push(board[r][c]);
-      }
-      const missing = rows - col.length;
-      const newCol = [];
-      for(let i=0;i<missing;i++) newCol.push(randType());
-      for(let v of col) newCol.push(v);
-      for(let r=0;r<rows;r++){
-        board[r][c] = newCol[r];
-      }
-    }
-    // rebuild DOM for simplicity and fresh event handlers
-    boardEl.innerHTML = '';
-    tilesMap.clear();
-    for(let r=0;r<rows;r++){
-      for(let c=0;c<cols;c++){
-        const t = board[r][c];
-        const id = nextId++;
-        const el = document.createElement('div');
-        el.className = `tile type-${t}`;
-        el.dataset.r = r; el.dataset.c = c; el.dataset.type = t; el.dataset.id = id;
-        el.style.left = posLeft(c) + 'px';
-        el.style.top  = posTop(r) + 'px';
-        el.style.opacity = 0;
-        boardEl.appendChild(el);
-        requestAnimationFrame(()=>{ el.style.opacity = 1; });
-        attachPointerHandlers(el);
-        tilesMap.set(String(id), el);
-      }
-    }
-  }
-
-  function flashTiles(coords){
-    for(const [r,c] of coords){
-      const el = findTileElAt(r,c);
-      if(!el) continue;
-      el.animate([
-        { transform: 'translateY(0px)' },
-        { transform: 'translateY(-8px)' },
-        { transform: 'translateY(0px)' }
-      ], { duration: 260, easing: 'cubic-bezier(.2,.9,.2,1)'});
-    }
-  }
-
-  function sleep(ms){ return new Promise(res=>setTimeout(res, ms)); }
-
-  // init
-  generateBoard();
-  render();
-
-  window.addEventListener('resize', ()=> {
-    setTileSize();
-    for(let el of boardEl.children){
-      const r = +el.dataset.r, c = +el.dataset.c;
-      el.style.left = posLeft(c) + 'px';
-      el.style.top  = posTop(r) + 'px';
-    }
-  });
-
-  window.addEventListener('keydown', (e)=>{
-    if (e.key === 'r'){ generateBoard(); render(); score=0; moves=0; scoreEl.textContent=0; movesEl.textContent=0; }
-  });
-
-})();
+/* 初期ドキュメント読み込み完了時にフォーカス関連を安全に初期化 */
+document.addEventListener('DOMContentLoaded', ()=>{ input=''; updateDots(); });
 </script>
 </body>
 </html>
