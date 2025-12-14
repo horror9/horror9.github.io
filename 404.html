@@ -1,29 +1,251 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width">
-    <title>Error 404 (Not Found)!!1</title>
-    <style>
-      *{margin:0;padding:0}html,code{font:15px/22px arial,sans-serif}html{background:#fff;color:#222;padding:15px}
-      body{margin:7% auto 0;max-width:390px;min-height:180px;padding:30px 0 15px}
-      * > body{background:url(//www.google.com/images/errors/robot.png) 100% 5px no-repeat;padding-right:205px}
-      p{margin:11px 0 22px;overflow:hidden}ins{color:#777;text-decoration:none}a img{border:0}
-      @media screen and (max-width:772px){body{background:none;margin-top:0;max-width:none;padding-right:0}}
-      #logo{background:url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png) no-repeat;margin-left:-5px}
-      @media only screen and (min-resolution:192dpi){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat 0% 0%/100% 100%;-moz-border-image:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) 0}}
-      @media only screen and (-webkit-min-device-pixel-ratio:2){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat;-webkit-background-size:100% 100%}}
-      #logo{display:inline-block;height:54px;width:150px}
-    </style>
-  </head>
-  <body>
-    <a href="//www.google.com/"><span id="logo" aria-label="Google"></span></a>
-    <p><b>404.</b> <ins>That’s an error.</ins></p>
-    <p>The requested URL <code id="requested-url"></code> was not found on this server. <ins>That’s all we know.</ins></p>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>404 — 見るなと言っただろ</title>
+  <style>
+    /* 基本 */
+    html,body{height:100%;margin:0;padding:0;font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:#000; color:#fff; overflow:hidden;}
+    :root{
+      --flash1:#ff0044;
+      --flash2:#00ddff;
+      --flash3:#ffd300;
+    }
 
-    <script>
-      // アクセスされたパスを取得して <code> に表示
-      document.getElementById('requested-url').textContent = window.location.pathname;
-    </script>
-  </body>
+    /* 中央カード */
+    .card{
+      position:absolute;
+      left:50%; top:50%;
+      transform:translate(-50%,-50%) rotate(-2deg);
+      width:min(900px,92%);
+      padding:28px;
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+      text-align:center;
+      backdrop-filter: blur(6px);
+      animation: wobble 4s ease-in-out infinite;
+    }
+    @keyframes wobble{
+      0%{transform:translate(-50%,-50%) rotate(-2deg) scale(1)}
+      50%{transform:translate(-50%,-50%) rotate(2deg) scale(1.02)}
+      100%{transform:translate(-50%,-50%) rotate(-2deg) scale(1)}
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(28px,6vw,84px);
+      letter-spacing:6px;
+      text-transform:uppercase;
+      font-weight:900;
+      line-height:0.9;
+      animation: colorFlash 1.2s steps(4) infinite;
+    }
+    @keyframes colorFlash{
+      0%{color:var(--flash1)}
+      33%{color:var(--flash2)}
+      66%{color:var(--flash3)}
+      100%{color:var(--flash1)}
+    }
+
+    p.lead{margin:12px 0 0 0; font-size:16px; opacity:0.95}
+    p.small{margin-top:6px; font-size:13px; opacity:0.8}
+
+    /* 馬鹿でかい404背景 */
+    .big404{
+      position:fixed;
+      left:50%; top:50%;
+      transform:translate(-50%,-50%);
+      font-size:40vw;
+      font-weight:900;
+      color:rgba(255,255,255,0.04);
+      pointer-events:none;
+      user-select:none;
+      filter:blur(1px);
+    }
+
+    /* 横スクロール警告 */
+    .marquee{
+      width:100%;
+      overflow:hidden;
+      white-space:nowrap;
+      box-sizing:border-box;
+      margin-top:18px;
+      border-top:2px dashed rgba(255,255,255,0.06);
+      padding-top:12px;
+    }
+    .marquee span{display:inline-block;padding:8px 18px; font-weight:700; transform:skewX(-8deg); animation: slide 7s linear infinite;}
+    @keyframes slide{0%{transform:translateX(100%) skewX(-8deg)}100%{transform:translateX(-140%) skewX(-8deg)}}
+
+    /* うざいボタン */
+    .btn{
+      display:inline-block;
+      margin-top:18px;
+      padding:12px 20px;
+      border-radius:12px;
+      border:3px dashed rgba(255,255,255,0.12);
+      background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      cursor:pointer;
+      font-weight:800;
+      font-size:15px;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+    /* 追いかける小さなポップ */
+    .nagger{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      padding:10px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg,#ff6b6b,#ffd400);
+      color:#111;
+      font-weight:800;
+      box-shadow:0 12px 30px rgba(0,0,0,0.5);
+      cursor:pointer;
+    }
+
+    /* 浮遊絵文字 */
+    .emoji{position:fixed; font-size:28px; pointer-events:none; user-select:none; animation: floatUp 6s linear forwards;}
+    @keyframes floatUp{0%{transform:translateY(0) rotate(0deg); opacity:1}100%{transform:translateY(-140vh) rotate(720deg); opacity:0}}
+
+    /* マウス追従影 */
+    .follower{position:fixed; left:0; top:0; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.06); pointer-events:none; transform:translate(-50%,-50%); transition:transform 0.05s linear;}
+
+    /* 小画面対応 */
+    @media (max-width:520px){
+      .big404{font-size:120vw}
+      .card{padding:18px}
+      .nagger{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="big404" aria-hidden="true">404</div>
+
+  <div class="card" role="main" aria-labelledby="title" aria-live="polite">
+    <h1 id="title">ページが見つからない！</h1>
+    <p class="lead">あ、君はここに来るべきじゃなかった。存在しないページだよ。閉じるか戻るか、どっちか選べばいいのに。</p>
+    <div class="marquee" aria-hidden="true"><span>404 — 存在しない — 閉じて — 戻れ — 404 — 見るな — 404 — 閉じろ</span></div>
+
+    <div style="margin-top:14px;">
+      <button class="btn" id="stayBtn">まだ見る</button>
+      <button class="btn" id="leaveBtn">消えろ</button>
+    </div>
+
+    <p class="small">ヒント: Escキーで色反転、任意のキーでさらに邪魔が入ります。</p>
+  </div>
+
+  <div class="nagger" id="nagger">まだ閉じないの？</div>
+  <div class="follower" id="follower" aria-hidden="true"></div>
+
+  <script>
+    // 注意：点滅が多め。光過敏の人は離れて。
+    const EMOJIS = ["💀","💩","🤡","👀","⚠️","🙈","😵","🔴","❌","🚫"];
+    function spawnEmoji(){
+      const e = document.createElement('div');
+      e.className = 'emoji';
+      e.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+      e.style.left = Math.random()*100 + 'vw';
+      e.style.top = (100 + Math.random()*12) + 'vh';
+      e.style.fontSize = (18 + Math.random()*80) + 'px';
+      document.body.appendChild(e);
+      setTimeout(()=>e.remove(), 7000 + Math.random()*4000);
+    }
+
+    // 定期的に絵文字を降らせる
+    const emojiInterval = setInterval(spawnEmoji, 520);
+
+    // ボタン動作
+    document.getElementById('stayBtn').addEventListener('click', ()=>{
+      // たくさんアラート（うざい）
+      for(let i=0;i<4;i++){
+        setTimeout(()=> alert("見続けるんだね。後悔するよ。"), i*250);
+      }
+      // 追加の絵文字爆撃
+      for(let i=0;i<20;i++){ setTimeout(spawnEmoji, i*60); }
+    });
+
+    document.getElementById('leaveBtn').addEventListener('click', ()=>{
+      // 画面をバラバラにして最終的にトップに飛ばす
+      document.body.style.transition = 'filter 0.6s ease, transform 0.9s ease';
+      document.body.style.transform = 'scale(0.86) rotate(-8deg)';
+      document.body.style.filter = 'blur(6px) hue-rotate(60deg)';
+      setTimeout(()=> {
+        // 強引にルートへ飛ばす（実際のサイトではここを適切なパスに変えて）
+        location.href = '/';
+      }, 900);
+    });
+
+    // 右下の小袋。触ると反応
+    const nag = document.getElementById('nagger');
+    nag.addEventListener('mouseenter', ()=> { nag.style.transform='scale(0.92)'; spawnEmoji(); });
+    nag.addEventListener('mouseleave', ()=> nag.style.transform='scale(1)');
+
+    // マウス追従
+    const follower = document.getElementById('follower');
+    window.addEventListener('mousemove', e => follower.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`);
+
+    // 任意キーでさらなる嫌がらせ
+    window.addEventListener('keydown', (ev) => {
+      // Escで反転
+      if(ev.key === 'Escape'){
+        document.body.style.filter = (document.body.style.filter==='invert(1)') ? 'invert(0)' : 'invert(1)';
+      } else {
+        // ランダムな効果を加える
+        document.body.style.transition = 'background 0.2s, transform 0.2s';
+        document.body.style.transform = `translate(${(Math.random()-0.5)*10}px, ${(Math.random()-0.5)*10}px)`;
+        // ちょっとだけビープ音（WebAudio）
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'square';
+          o.frequency.value = 220 + Math.random()*880;
+          g.gain.value = 0.02;
+          o.connect(g); g.connect(ctx.destination);
+          o.start();
+          setTimeout(()=>{ o.stop(); ctx.close(); }, 80 + Math.random()*160);
+        } catch(e){ /* ブラウザが許可しない場合は静かに */ }
+        // 少し絵文字を出す
+        for(let i=0;i<4;i++){ setTimeout(spawnEmoji, i*60); }
+      }
+    });
+
+    // ページ読み込み後、短いシュルッとしたテキスト（嫌）
+    setTimeout(()=> {
+      const bar = document.createElement('div');
+      bar.style.position='fixed'; bar.style.left='50%'; bar.style.top='8%';
+      bar.style.transform='translateX(-50%)';
+      bar.style.padding='10px 16px'; bar.style.borderRadius='10px';
+      bar.style.background='rgba(255,0,68,0.92)'; bar.style.color='#fff'; bar.style.fontWeight='800';
+      bar.textContent = "404 — 存在しないページ — すぐ閉じて";
+      document.body.appendChild(bar);
+      setTimeout(()=> bar.remove(), 6000);
+    }, 800);
+
+    // 最後に、もしサイトに戻るリンクが欲しければ1秒後に表示してあげる（親切）
+    setTimeout(()=>{
+      const link = document.createElement('a');
+      link.href = "/";
+      link.textContent = "サイトトップへ（本当に消えたいなら押せ）";
+      link.style.display='inline-block';
+      link.style.marginTop='14px';
+      link.style.padding='8px 12px';
+      link.style.borderRadius='10px';
+      link.style.background='rgba(255,255,255,0.06)';
+      link.style.color='#fff';
+      link.style.fontWeight='700';
+      link.style.textDecoration='none';
+      document.querySelector('.card').appendChild(link);
+    }, 1000);
+
+    // クリーンアップ: タブが非表示なら爆撃を遅らせる（ブラウザに優しい）
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) clearInterval(emojiInterval);
+    });
+  </script>
+</body>
 </html>
