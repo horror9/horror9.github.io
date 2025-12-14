@@ -1,3 +1,284 @@
-<script>
-  location.href="https://ss.sabae.cc";
-</script>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>絶対に見たくないページ</title>
+  <style>
+    /* フォントと基礎 */
+    html,body {height:100%; margin:0; padding:0; font-family:"Comic Sans MS", "Apple Color Emoji", "Segoe UI", sans-serif;}
+    body {
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(45deg, #ff4d4d, #ffd24d, #4dff88, #4dd0ff);
+      background-size: 400% 400%;
+      animation: bgShift 12s linear infinite;
+      color:#111;
+    }
+
+    @keyframes bgShift {
+      0%{background-position:0% 50%}
+      25%{background-position:50% 100%}
+      50%{background-position:100% 50%}
+      75%{background-position:50% 0%}
+      100%{background-position:0% 50%}
+    }
+
+    /* 大きなうるさい見出し */
+    .screamer {
+      position:relative;
+      text-align:center;
+      padding:30px;
+      border-radius:18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.85);
+      transform: rotate(-1deg);
+      max-width:90%;
+      animation: wobble 3s ease-in-out infinite;
+    }
+    @keyframes wobble {
+      0%{transform: rotate(-1deg) scale(1)}
+      50%{transform: rotate(1.5deg) scale(1.04)}
+      100%{transform: rotate(-1deg) scale(1)}
+    }
+
+    h1 {
+      margin:0 0 12px 0;
+      font-size: clamp(24px, 6vw, 72px);
+      letter-spacing: 4px;
+      text-transform:uppercase;
+      animation: flashColor 1.6s steps(6) infinite;
+    }
+    @keyframes flashColor {
+      0%{color:#111}
+      25%{color:#ff0044}
+      50%{color:#00aaee}
+      75%{color:#ffdd00}
+      100%{color:#111}
+    }
+
+    /* シュッと流れる帯（marquee的） */
+    .scroll {
+      width:100%;
+      overflow:hidden;
+      white-space:nowrap;
+      box-sizing:border-box;
+      margin-top:8px;
+    }
+    .scroll span {
+      display:inline-block;
+      padding:8px 14px;
+      font-weight:bold;
+      transform:skewX(-10deg);
+      animation: slideLeft 6s linear infinite;
+    }
+    @keyframes slideLeft {
+      0%{transform: translateX(100%) skewX(-10deg)}
+      100%{transform: translateX(-120%) skewX(-10deg)}
+    }
+
+    /* 目にうるさい点滅ボタン */
+    .annoy {
+      margin-top:18px;
+      padding:12px 20px;
+      font-size:18px;
+      border-radius:10px;
+      border:3px dashed #222;
+      cursor:pointer;
+      animation: pulse 0.9s ease-in-out infinite;
+      background: linear-gradient(90deg,#ff9a9e,#fad0c4);
+    }
+    @keyframes pulse {
+      0%{transform:scale(1)}
+      50%{transform:scale(1.06)}
+      100%{transform:scale(1)}
+    }
+
+    /* 画面の端を埋める絵文字 */
+    .emoji {
+      position:fixed;
+      font-size:28px;
+      will-change:transform,opacity;
+      pointer-events:none;
+      user-select:none;
+      animation: floatUp 6s linear forwards;
+    }
+    @keyframes floatUp {
+      0%{transform:translateY(0) rotate(0deg); opacity:1}
+      100%{transform:translateY(-120vh) rotate(720deg); opacity:0}
+    }
+
+    /* 入力が勝手に打たれるフィールド */
+    .typebox {
+      margin-top:14px;
+      display:inline-block;
+    }
+    input[type="text"]{
+      font-size:16px;
+      padding:8px 10px;
+      border-radius:8px;
+      border:2px solid #333;
+      width:280px;
+    }
+
+    /* モーダル（閉じにくい） */
+    .modal {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,0.6);
+      z-index:999;
+      backdrop-filter: blur(4px);
+    }
+    .modal .card{
+      width:min(720px,92%);
+      padding:22px;
+      background:#fff;
+      border-radius:12px;
+      text-align:center;
+      box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    }
+    .modal .card p{margin:10px 0 0 0; font-size:14px; color:#333}
+    .modal .card button{margin-top:12px; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:bold;}
+
+    /* 小さな邪魔者（右下） */
+    .nagger {
+      position:fixed;
+      right:12px;
+      bottom:12px;
+      background:linear-gradient(180deg,#ffd400,#ff6b6b);
+      padding:10px 14px;
+      border-radius:12px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.2);
+    }
+
+    /* マウス追従するイヤな影響 */
+    .follower {
+      position:fixed;
+      left:0; top:0;
+      width:18px; height:18px;
+      border-radius:50%;
+      background:rgba(0,0,0,0.6);
+      pointer-events:none;
+      transform:translate(-50%,-50%);
+      mix-blend-mode:screen;
+      transition:transform 0.06s linear;
+    }
+
+    /* 小画面調整 */
+    @media (max-width:520px){
+      .screamer{padding:18px}
+      .nagger{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="screamer" role="main" aria-live="polite">
+    <h1>見たくないなら見るな</h1>
+
+    <div class="scroll" aria-hidden="true">
+      <span>⚠️ 見ると後悔する — 見たくないページ — 閉じることを強く推奨 ⚠️</span>
+    </div>
+
+    <div class="typebox" aria-hidden="false">
+      <input id="fakeInput" type="text" placeholder="ここに何かを書く…" />
+      <button class="annoy" id="spamBtn">押すな</button>
+    </div>
+
+    <div class="nagger" role="note" aria-hidden="true">まだ閉じてないの？</div>
+  </div>
+
+  <!-- モーダル（5秒後に閉じる） -->
+  <div class="modal" id="modal">
+    <div class="card">
+      <h2>注意：このページは嫌がらせ用に作られています</h2>
+      <p>見続けると軽い不快感を与えるようデザインされています。閉じるボタンを押してください。</p>
+      <button id="closeModal">閉じる（やっと）</button>
+    </div>
+  </div>
+
+  <div class="follower" id="follower" aria-hidden="true"></div>
+
+  <script>
+    // モーダルは5秒経つと自動で閉じる（ただし閉じてからも嫌がらせは続く）
+    setTimeout(()=>{document.getElementById('modal').style.display='none'}, 5000);
+
+    // うざい絵文字を定期的に生成
+    const EMOJIS = ["💩","🤢","👎","😵","🙈","🫠","😬","😒","🫨","❌"];
+    function spawnEmoji(){
+      const e = document.createElement('div');
+      e.className = 'emoji';
+      e.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+      e.style.left = Math.random()*100 + 'vw';
+      e.style.top = (100 + Math.random()*10) + 'vh';
+      e.style.fontSize = (16 + Math.random()*60) + 'px';
+      e.style.transform = 'translateY(0)';
+      document.body.appendChild(e);
+      // 削除
+      setTimeout(()=> e.remove(), 7000 + Math.random()*3000);
+    }
+    setInterval(spawnEmoji, 600);
+
+    // ボタンの邪悪な挙動
+    document.getElementById('spamBtn').addEventListener('click', ()=>{
+      for(let i=0;i<6;i++){
+        setTimeout(()=>alert("言ったでしょ、押すなと。"), i*300);
+      }
+    });
+
+    // 入力欄に勝手に文字を打ち込む（無害な無意味文字列）
+    const fakeInput = document.getElementById('fakeInput');
+    const junk = "あああうへへぴえぴえ0123456789<>#¥*♪";
+    let pos = 0;
+    setInterval(()=>{
+      fakeInput.value = fakeInput.value + junk.charAt(Math.floor(Math.random()*junk.length));
+      if(fakeInput.value.length > 60) fakeInput.value = fakeInput.value.slice(-40);
+    }, 420);
+
+    // 左下に小さな「いやらしい」追従丸
+    const follower = document.getElementById('follower');
+    window.addEventListener('mousemove', e=>{
+      follower.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    });
+
+    // 広告風の右下に触ると小さくなる嫌がらせ
+    const nag = document.querySelector('.nagger');
+    nag.addEventListener('mouseenter', ()=> nag.style.transform='scale(0.9)');
+    nag.addEventListener('mouseleave', ()=> nag.style.transform='scale(1)');
+
+    // モーダル閉じる
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      document.getElementById('modal').style.display='none';
+      // 微妙に余計なものを出す
+      for(let i=0;i<12;i++){ setTimeout(spawnEmoji, i*80); }
+    });
+
+    // キーボードでEscを押すと画面が反転（さらにイヤ）
+    window.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'Escape'){
+        document.body.style.filter = (document.body.style.filter==='invert(1)') ? 'invert(0)' : 'invert(1)';
+      }
+    });
+
+    // 最後に「見るな」って言いながら自動で何かを表示
+    setTimeout(()=>{
+      const t = document.createElement('div');
+      t.style.position='fixed';
+      t.style.left='50%'; t.style.top='10%';
+      t.style.transform='translateX(-50%)';
+      t.style.background='rgba(0,0,0,0.85)';
+      t.style.color='#fff';
+      t.style.padding='12px 18px';
+      t.style.borderRadius='10px';
+      t.style.fontWeight='700';
+      t.textContent = "もう見たでしょう。いいね？";
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(), 6000);
+    }, 9000);
+  </script>
+</body>
+</html>
