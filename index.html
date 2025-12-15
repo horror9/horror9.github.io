@@ -1,383 +1,43 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ブラックホールに吸い込まれるテキスト</title>
-<style>
-  :root{
-    --bg:#05060a;
-    --accent:#6ee7ff;
-    --hole-outer:#0b0f1a;
-  }
-  html,body{
-    height:100%;
-    margin:0;
-    font-family: "Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.02) 0 1px, transparent 1px),
-                radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.015) 0 1px, transparent 1px),
-                var(--bg);
-    background-size: 2px 2px, 3px 3px, auto;
-    color: #fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-  }
-
-  .stage{
-    position:relative;
-    width: min(1100px, 92vw);
-    height: min(540px, 70vh);
-    overflow:hidden;
-    border-radius:12px;
-    box-shadow: 0 10px 60px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-    background:
-      radial-gradient(1200px 600px at -10% -20%, rgba(110,231,255,0.02), transparent 10%),
-      linear-gradient(180deg, rgba(255,255,255,0.01), transparent 30%),
-      rgba(0,0,0,0.15);
-  }
-
-  /* ブラックホールビジュアル */
-  .blackhole{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:180px;
-    height:180px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background:
-      radial-gradient(circle at 50% 45%, rgba(255,255,255,0.04) 0 6%, rgba(255,255,255,0.02) 8% 12%, transparent 20%),
-      radial-gradient(circle at 50% 50%, rgba(0,0,0,0.98) 0 48%, rgba(10,10,10,0.9) 50% 55%, transparent 100%),
-      conic-gradient(from 200deg, rgba(110,231,255,0.06), transparent 30%);
-    box-shadow:
-      0 0 40px rgba(110,231,255,0.03), 0 8px 30px rgba(0,0,0,0.6), inset 0 -8px 20px rgba(0,0,0,0.6);
-    filter: drop-shadow(0 6px 30px rgba(0,0,0,0.8));
-    z-index:30;
-    pointer-events:none;
-  }
-
-  /* イベント的にリングを回す */
-  .blackhole::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    box-shadow: 0 0 60px rgba(110,231,255,0.08);
-    mix-blend-mode:screen;
-    animation: rim 6s linear infinite;
-  }
-  @keyframes rim{
-    from{ transform: rotate(0deg); }
-    to{ transform: rotate(360deg); }
-  }
-
-  /* テキスト要素全体 */
-  #text{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    width:100%;
-    height:100%;
-    z-index:20;
-    pointer-events:none;
-  }
-
-  .char{
-    position:absolute;
-    left:0;
-    top:0;
-    transform-origin:center center;
-    font-weight:700;
-    font-size: clamp(22px, 4.5vw, 48px);
-    white-space:pre;
-    will-change: transform, opacity, filter;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.03),
-      0 6px 20px rgba(2,6,23,0.6);
-  }
-
-  /* 小さな中心へ消える粒子 */
-  .particle {
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:6px;height:6px;
-    border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #fff, var(--accent));
-    transform:translate(-50%,-50%) scale(0.6);
-    opacity:0.9;
-    pointer-events:none;
-    z-index:25;
-  }
-
-  /* ボタン（再生 / リセット）控えめ */
-  .controls{
-    position:absolute;
-    right:10px;
-    bottom:10px;
-    z-index:60;
-    display:flex;
-    gap:8px;
-  }
-  .controls button{
-    background: rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.06);
-    color:#cfefff;
-    padding:8px 10px;
-    border-radius:8px;
-    cursor:pointer;
-    backdrop-filter: blur(6px);
-  }
-  .controls button:hover{ transform: translateY(-2px); }
-  .credits{
-    position:absolute;
-    left:12px;
-    bottom:8px;
-    font-size:12px;
-    color:rgba(255,255,255,0.45);
-    z-index:60;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Protected Content</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    #content {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-  <div class="stage" id="stage" aria-hidden="false">
-    <div class="blackhole" id="blackhole" aria-hidden="true"></div>
-    <div id="text" aria-hidden="true"></div>
+  <h1>この先は人間のみ</h1>
 
-    <div class="controls" aria-hidden="true">
-      <button id="playBtn">再生</button>
-      <button id="resetBtn">リセット</button>
-    </div>
-    <div class="credits">テキストがブラックホールに… — created by you + a slightly annoyed AI</div>
+  <p>コンテンツを表示するには reCAPTCHA を完了してください。</p>
+
+  <!-- reCAPTCHA -->
+  <div class="g-recaptcha"
+       data-sitekey="6LeqICwsAAAAAG73B0XgIkTQ6kgXNtmO4Emz6o_f"
+       data-callback="onVerified"></div>
+
+  <!-- 守られているコンテンツ -->
+  <div id="content">
+    <h2>限定コンテンツ</h2>
+    <p>おめでとうございます。あなたはロボットではないらしい。</p>
   </div>
 
-<script>
-/*
-  仕組み（簡潔）:
-  - テキスト文字ごとに span を作る
-  - 各文字は初期座標（行上に並べる）を持つ
-  - アニメーションでは r（中心からの距離）を 1→0 にしつつ角度をぐるぐる回す
-  - スピン、スケール、ブラー、透明度で「吸い込まれる」演出
-*/
-(() => {
-  const stage = document.getElementById('stage');
-  const textRoot = document.getElementById('text');
-  const hole = document.getElementById('blackhole');
-  const playBtn = document.getElementById('playBtn');
-  const resetBtn = document.getElementById('resetBtn');
+  <script>
+    function onVerified(token) {
+      // 本来はここでサーバーに token を送って検証する
+      console.log("reCAPTCHA token:", token);
 
-  // ここを好きに変えて。日本語OK。
-  const STR = "テキストがブラックホールに吸い込まれる";
-  const chars = Array.from(STR); // Japan text safe enough for this use
-
-  let spans = [];
-  let particles = [];
-  let animId = null;
-  let startTime = null;
-  let duration = 3200; // ms, 全体の速さ
-  let started = false;
-
-  function setup() {
-    // クリア
-    textRoot.innerHTML = '';
-    spans = [];
-    particles.forEach(p => p.remove());
-    particles = [];
-
-    const rect = stage.getBoundingClientRect();
-    const center = { x: rect.width/2, y: rect.height/2 };
-
-    // 文字を横に中央寄せで並べる
-    // 見た目優先でフォントサイズ決める
-    const fontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fs') || 0);
-    const baseSize = Math.min(48, Math.max(20, rect.width / 20));
-    const lineY = center.y - 120; // 少し上から吸い込まれる雰囲気
-    // 一時的に作って幅を測る
-    const meas = document.createElement('div');
-    meas.style.position = 'absolute';
-    meas.style.left = '-9999px';
-    meas.style.top = '-9999px';
-    meas.style.fontWeight = '700';
-    meas.style.fontSize = baseSize + 'px';
-    document.body.appendChild(meas);
-
-    let totalWidth = 0;
-    const widths = chars.map(ch => {
-      meas.textContent = ch;
-      const w = meas.getBoundingClientRect().width + 4;
-      totalWidth += w;
-      return w;
-    });
-    meas.remove();
-
-    let cursor = center.x - totalWidth/2;
-    chars.forEach((ch, i) => {
-      const span = document.createElement('span');
-      span.className = 'char';
-      span.textContent = ch;
-      span.style.fontSize = baseSize + 'px';
-      textRoot.appendChild(span);
-
-      const w = widths[i];
-      const x = cursor + w/2;
-      const y = lineY + (Math.random()*12 - 6); // 少しばらつかせる
-
-      // 各文字の初期情報を保存
-      const dx = x - center.x;
-      const dy = y - center.y;
-      const radius = Math.hypot(dx, dy);
-      const angle = Math.atan2(dy, dx);
-
-      // random spin direction and speed
-      const spin = (Math.random() > 0.5 ? 1 : -1) * (2 + Math.random()*3);
-
-      spans.push({
-        el: span,
-        init: { x, y, radius, angle },
-        spin,
-        delay: (i * 30) + Math.random()*150 // 少しずらして自然に
-      });
-
-      // 初期配置（ピクセル座標）
-      span.style.left = x + 'px';
-      span.style.top = y + 'px';
-      span.style.opacity = '1';
-      span.style.transform = 'translate(-50%,-50%) scale(1) rotate(0deg)';
-
-      cursor += w;
-    });
-
-    // 作り物の小さな粒子を中心に配置（消える用）
-    for (let i=0;i<28;i++){
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.opacity = '0';
-      stage.appendChild(p);
-      particles.push(p);
+      // デモなので即表示
+      document.getElementById("content").style.display = "block";
     }
-  }
-
-  // イーズ（滑らかに）
-  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
-  function easeInQuad(t){ return t*t; }
-
-  function animate(timestamp){
-    if (!startTime) startTime = timestamp;
-    const tAll = timestamp - startTime;
-
-    let allDone = true;
-    const rect = stage.getBoundingClientRect();
-    const cx = rect.width/2;
-    const cy = rect.height/2;
-
-    // update chars
-    spans.forEach(s => {
-      const localT = Math.max(0, Math.min(1, (tAll - s.delay) / duration));
-      if (localT < 1) allDone = false;
-
-      // r goes from init.radius -> 6 (almost center)
-      const r = s.init.radius * (1 - easeOutCubic(localT)) + 4 * easeInQuad(localT);
-
-      // angle spins more as it approaches center
-      const angle = s.init.angle + s.spin * (1 - Math.cos(Math.PI * localT)) * 2.5;
-
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-
-      // Visuals
-      const p = Math.min(1, localT);
-      const scale = Math.max(0.06, 1 - 0.96 * p);
-      const blur = Math.min(6, p * 6);
-      const opacity = Math.max(0, 1 - Math.pow(p, 0.9) * 1.1);
-
-      s.el.style.left = x + 'px';
-      s.el.style.top = y + 'px';
-      s.el.style.transform = `translate(-50%,-50%) scale(${scale}) rotate(${ (1-p)*20 }deg)`;
-      s.el.style.opacity = opacity;
-      s.el.style.filter = `blur(${blur}px) saturate(${1 - p*0.4})`;
-    });
-
-    // 粒子エフェクト（中心付近でパッと現れて吸い込まれる）
-    particles.forEach((p,i) => {
-      // staggered appearance
-      const appearAt = 300 + i*40;
-      if (tAll > appearAt && tAll < appearAt + 900) {
-        const local = (tAll - appearAt) / 900;
-        const ang = (i / particles.length) * Math.PI * 2 + local * 6;
-        const r = 160 * (1 - easeOutCubic(local));
-        const px = cx + r * Math.cos(ang);
-        const py = cy + r * Math.sin(ang);
-        p.style.left = px + 'px';
-        p.style.top = py + 'px';
-        p.style.opacity = Math.max(0, 1 - local*1.3);
-        p.style.transform = `translate(-50%,-50%) scale(${0.6 + local*0.6})`;
-      } else {
-        p.style.opacity = '0';
-      }
-    });
-
-    // 少しブラックホール周りのサイズをアニメさせて脈動感
-    const pulse = 1 + 0.06 * Math.sin((tAll / 300) * Math.PI * 2);
-    hole.style.transform = `translate(-50%,-50%) scale(${pulse})`;
-
-    if (!allDone) {
-      animId = requestAnimationFrame(animate);
-    } else {
-      animId = null;
-      started = false;
-      startTime = null;
-    }
-  }
-
-  function play(){
-    if (started) return;
-    started = true;
-    if (animId) cancelAnimationFrame(animId);
-    startTime = null;
-    animId = requestAnimationFrame(animate);
-  }
-
-  function reset(){
-    if (animId) cancelAnimationFrame(animId);
-    started = false;
-    startTime = null;
-    spans.forEach(s => {
-      s.el.style.opacity = '1';
-      s.el.style.filter = 'none';
-      s.el.style.transform = 'translate(-50%,-50%) scale(1) rotate(0deg)';
-      s.el.style.left = s.init.x + 'px';
-      s.el.style.top = s.init.y + 'px';
-    });
-    particles.forEach(p => p.style.opacity = '0');
-  }
-
-  // 初期配置
-  setup();
-
-  // 自動再生（やる気があるなら無効にして）
-  setTimeout(play, 550);
-
-  // ボタン
-  playBtn.addEventListener('click', () => { play(); });
-  resetBtn.addEventListener('click', () => { reset(); });
-
-  // リサイズ時再セット
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const prevState = started;
-      if (animId) cancelAnimationFrame(animId);
-      setup();
-      if (prevState) setTimeout(play, 120);
-    }, 120);
-  });
-
-})();
-</script>
+  </script>
 </body>
 </html>
