@@ -1,353 +1,244 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Googlebot 管理デモ（ローカル）</title>
-<style>
-  :root{
-    --bg:#0f1720; --panel:#0b1220; --muted:#9aa7b2; --accent:#06c; --ok:#16a34a; --err:#ef4444;
-    --glass: rgba(255,255,255,0.03);
-  }
-  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  body{background:linear-gradient(180deg,#071022 0%, #071724 100%); color:#e6eef6; display:flex; gap:16px; padding:18px; box-sizing:border-box;}
-  .app{display:grid;grid-template-columns:320px 1fr;gap:16px; width:100%; max-width:1400px; margin:0 auto;}
-  .sidebar{background:var(--panel); padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.6);}
-  h1{margin:0 0 12px 0;font-size:18px}
-  .section{margin-bottom:14px}
-  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-  select,input[type="text"],textarea{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit;outline:none}
-  textarea{min-height:140px;resize:vertical}
-  button{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:white;cursor:pointer}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-  .row{display:flex;gap:8px}
-  .main{display:flex;flex-direction:column;gap:16px}
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-  .logs{height:240px;overflow:auto;background:#021024;border-radius:8px;padding:10px;font-family:monospace;font-size:13px;color:#bfe6ff}
-  .status-ok{color:var(--ok)}
-  .status-err{color:var(--err)}
-  .controls{display:flex;gap:8px;flex-wrap:wrap}
-  .preview{display:flex;gap:12px;align-items:center}
-  .img-thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,0.04)}
-  .meta{font-size:13px;color:var(--muted)}
-  .small{font-size:12px;color:var(--muted)}
-  footer{color:var(--muted);font-size:12px;padding:6px 0}
-  .toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between}
-  .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:8px;font-size:12px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>アカウント削除 — 確認</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#ff5c5c;
+      --muted:#9aa4b2; --radius:12px; --gap:18px;
+      font-family: Inter, Roboto, "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(180deg,#071021 0%, #0b1220 100%); color:#e6eef6;
+      padding:32px;
+    }
+    .card{
+      width:100%; max-width:820px; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius:var(--radius); padding:28px; box-shadow:0 8px 30px rgba(2,6,23,0.7);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    header{display:flex; align-items:center; gap:16px; margin-bottom:10px}
+    header h1{font-size:20px; margin:0}
+    p.lead{color:var(--muted); margin:6px 0 20px}
+    .grid{display:grid; grid-template-columns:1fr 360px; gap:var(--gap)}
+    @media (max-width:860px){ .grid{grid-template-columns:1fr; } .aside{order:2} }
+    .section{background:rgba(255,255,255,0.02); padding:18px; border-radius:10px; border:1px solid rgba(255,255,255,0.02)}
+    .field{margin-bottom:12px}
+    label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+    input[type="password"], input[type="text"], textarea{
+      width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
+      background:transparent; color:inherit; font-size:15px;
+    }
+    textarea{min-height:92px; resize:vertical}
+    .muted{font-size:13px; color:var(--muted)}
+    .danger{
+      background:linear-gradient(90deg, rgba(255,92,92,0.12), rgba(255,92,92,0.08));
+      border:1px solid rgba(255,92,92,0.14);
+      color:#ffdede;
+    }
+    .aside{display:flex; flex-direction:column; gap:12px; align-items:stretch}
+    .preview{padding:14px; border-radius:10px; background:rgba(255,255,255,0.012)}
+    .btn{
+      display:inline-block; padding:10px 14px; border-radius:10px; cursor:pointer;
+      border:0; font-weight:600; font-size:14px;
+    }
+    .btn.danger{background:var(--accent); color:white}
+    .btn.ghost{background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted)}
+    .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:8px}
+    .checkbox{display:flex; gap:10px; align-items:flex-start}
+    .tiny{font-size:13px;color:var(--muted)}
+    /* modal */
+    .modal-backdrop{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(2,6,23,0.6); z-index:60; padding:20px;
+    }
+    .modal{width:100%; max-width:520px; background:var(--card); border-radius:12px; padding:20px; border:1px solid rgba(255,255,255,0.03)}
+    .modal h2{margin:0 0 6px}
+    .kbd{font-family:monospace; background:rgba(255,255,255,0.03); padding:2px 6px; border-radius:6px; font-size:13px}
+    .error{color:#ffb3b3; font-size:13px; margin-top:6px}
+    footer {margin-top:14px; color:var(--muted); font-size:13px}
+    /* accessibility focus */
+    :focus{outline:3px solid rgba(255,255,255,0.06); outline-offset:2px}
+  </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="Googlebot管理デモ">
-    <aside class="sidebar panel" aria-label="操作パネル">
-      <h1>Googlebot 管理（デモ）</h1>
-      <div class="section">
-        <label>User-Agent</label>
-        <select id="uaSelect">
-          <option value="googlebot">Googlebot (Desktop)</option>
-          <option value="googlebot-mobile">Googlebot (Smartphone)</option>
-          <option value="googlebot-image">Googlebot-Image</option>
-        </select>
+  <!-- data-username は実際のユーザー名をサーバーから埋め込んでください -->
+  <main class="card" role="main" aria-labelledby="page-title" data-username="yamada.taro">
+    <header>
+      <svg width="36" height="36" viewBox="0 0 24 24" aria-hidden focusable="false"><circle cx="12" cy="12" r="10" fill="#1b2430"/><path d="M12 7v6" stroke="#ff5c5c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>
+        <h1 id="page-title">アカウント削除</h1>
+        <p class="lead">アカウントを完全に削除すると、復元できません。データはすべて消去されます。</p>
       </div>
+    </header>
 
-      <div class="section">
-        <label>robots.txt（編集して即時反映）</label>
-        <textarea id="robotsEditor"></textarea>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="applyRobots">適用</button>
-          <button id="presetBlocked" class="btn-ghost">gstatic ロゴをブロックする例</button>
-        </div>
-      </div>
+    <div class="grid" aria-live="polite">
+      <section class="section" aria-label="削除フォーム">
+        <form id="deleteForm" action="/delete-account" method="POST" novalidate>
+          <!-- サーバー側でCSRFトークンを埋め込んでください -->
+          <!-- <input type="hidden" name="csrf_token" value="{{csrf_token}}"> -->
 
-      <div class="section">
-        <label>テスト URL</label>
-        <input id="testUrl" type="text" placeholder="/path/to/resource or https://example.com/some.png" />
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="testBtn">クロールをシミュレート</button>
-          <button id="clearLogs" class="btn-ghost">ログクリア</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <label>オプション</label>
-        <div class="row">
-          <label class="small"><input type="checkbox" id="simulateBlockedFetch" /> 外部リソースは robots.txt でブロック</label>
-        </div>
-        <div style="margin-top:8px" class="small">備考: これはローカルシミュレーションです。本物のGooglebotの挙動はもっと複雑。</div>
-      </div>
-
-      <footer>
-        <div class="small">デモです。本物のGoogleサービスに変更は加えません。</div>
-      </footer>
-    </aside>
-
-    <main class="main">
-      <div class="panel">
-        <div class="toolbar">
-          <div>
-            <strong>クロールログ</strong>
-            <span class="small" id="logMeta">空</span>
+          <div class="field">
+            <label>アカウント</label>
+            <div class="muted" id="accountNameDisplay" aria-live="polite"></div>
           </div>
-          <div class="chips" aria-hidden>
-            <div class="chip">SSE: ログ流し可</div>
-            <div class="chip">robots.txt テスト</div>
-            <div class="chip">UA 切替</div>
+
+          <div class="field">
+            <label for="password">パスワード（再確認のため）</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required aria-required="true" />
+            <div class="tiny muted">アカウント所有の確認のため、現在のパスワードを入力してください。</div>
           </div>
-        </div>
-        <div class="logs" id="logs" role="log" aria-live="polite"></div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button id="downloadLogs" class="btn-ghost">ログをダウンロード</button>
-          <button id="copyLogs" class="btn-ghost">ログをコピー</button>
-        </div>
-      </div>
 
-      <div class="panel" id="previewPanel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <strong>プレビュー / 判定</strong>
-          <div class="small" id="previewHint">ここに判定の要約が出ます</div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:center">
-          <img id="previewImg" class="img-thumb" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMDMxNTRGIiByeD0iOCIvPjx0ZXh0IHg9IjMyIiB5PSIzNiIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IlZlcmRhbmEsIGFyaWFsLCBzYW5zLXNlcmlmIj50aW1lbGluZTwvdGV4dD48L3N2Zz4=" alt="preview" />
-          <div>
-            <div id="previewTitle"><strong>リソース:</strong> —</div>
-            <div class="meta" id="previewMeta">method: POST · Accept: text/event-stream</div>
-            <div style="margin-top:8px" id="previewDecision">
-              まだ何もテストされていません
-            </div>
+          <div class="field">
+            <label for="reason">削除理由（任意）</label>
+            <textarea id="reason" name="reason" placeholder="例: サービスを使わなくなった"></textarea>
           </div>
-        </div>
-      </div>
 
-      <div class="panel">
-        <strong>内部モデル（何が起きるか、ざっくり説明）</strong>
-        <ol style="margin-top:8px" class="small">
-          <li>テストボタンでURLを送る（User-Agentは選択済み）</li>
-          <li>robots.txt をパースして Allow/Disallow を評価</li>
-          <li>外部ドメインの場合は「外部リソースブロック」オプションを参照</li>
-          <li>許可されていれば疑似Fetch（擬似遅延）を行いログを流す</li>
-        </ol>
-        <div style="margin-top:10px" class="small">注意：本デモは簡易判定です。実際のクロールでは Google のブラックボックスが山ほど働きます。</div>
+          <div class="field">
+            <label for="confirmText">確認 — 以下を正確に入力してください</label>
+            <div class="tiny muted">アカウントを削除するには、あなたのアカウント名を正確に入力してください。</div>
+            <input id="confirmText" name="confirmText" type="text" placeholder="アカウント名を正確に入力" aria-describedby="confirmHelp" required />
+            <div id="confirmHelp" class="tiny muted">例: <span id="sampleName" class="kbd"></span></div>
+            <div id="confirmError" class="error" role="status" aria-live="polite" style="display:none"></div>
+          </div>
+
+          <div class="field checkbox">
+            <input id="ack" type="checkbox" />
+            <label for="ack" class="tiny">私はアカウントの削除が不可逆であることを理解しており、データが消去されることに同意します。</label>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="cancelBtn" class="btn ghost" onclick="location.assign('/settings')">キャンセル</button>
+            <button type="button" id="deleteBtn" class="btn danger" disabled aria-disabled="true">アカウントを削除</button>
+          </div>
+        </form>
+        <footer>削除後はログイン不可。請求や支払いに関する情報も削除されます（必要に応じて別途処理が必要）。</footer>
+      </section>
+
+      <aside class="aside" aria-label="確認サイドバー">
+        <div class="preview section danger" aria-hidden="false">
+          <strong>警告</strong>
+          <p class="muted">この操作は取り消せません。アカウント名とパスワードの両方を正しく入力する必要があります。</p>
+        </div>
+
+        <div class="section preview">
+          <strong>なにが消えるか</strong>
+          <ul class="tiny muted">
+            <li>プロフィールとパブリック情報</li>
+            <li>保存済みデータ（投稿、ファイル、設定など）</li>
+            <li>サブスクリプションは別途解約が必要な場合があります</li>
+          </ul>
+        </div>
+
+        <div class="section preview">
+          <strong>セキュリティ</strong>
+          <p class="tiny muted">サーバー側での再認証（例: メール確認、2段階認証）があると更に安全です。導入推奨。</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- モーダル -->
+  <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">最終確認 — 本当に削除しますか？</h2>
+      <p class="muted">アカウント: <span id="modalAccount" class="kbd"></span></p>
+      <p class="muted">この操作は永久にデータを削除します。復元はできません。</p>
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px">
+        <button id="modalCancel" class="btn ghost">やめる</button>
+        <button id="modalConfirm" class="btn danger">完全に削除する</button>
       </div>
-    </main>
+    </div>
   </div>
 
-<script>
-/*
-  Googlebot 管理デモ（ローカル）
-  - robots.txt の簡易パーサ（User-agent/Allow/Disallow）
-  - URL の相対→絶対変換
-  - ログを擬似的に SSE 風に出す
-  - "gstaticロゴがブロックされている" プリセットを用意
-*/
+  <script>
+    (function(){
+      const main = document.querySelector('main');
+      const username = main.dataset.username || ''; // サーバーで埋めること（安全）
+      const accountDisplay = document.getElementById('accountNameDisplay');
+      const sampleName = document.getElementById('sampleName');
+      const confirmText = document.getElementById('confirmText');
+      const ack = document.getElementById('ack');
+      const deleteBtn = document.getElementById('deleteBtn');
+      const passwordInput = document.getElementById('password');
+      const confirmError = document.getElementById('confirmError');
 
-const logsEl = document.getElementById('logs');
-const uaSelect = document.getElementById('uaSelect');
-const robotsEditor = document.getElementById('robotsEditor');
-const applyRobots = document.getElementById('applyRobots');
-const testBtn = document.getElementById('testBtn');
-const testUrlInput = document.getElementById('testUrl');
-const previewTitle = document.getElementById('previewTitle');
-const previewMeta = document.getElementById('previewMeta');
-const previewDecision = document.getElementById('previewDecision');
-const previewImg = document.getElementById('previewImg');
-const presetBlocked = document.getElementById('presetBlocked');
-const simulateBlockedFetch = document.getElementById('simulateBlockedFetch');
-const clearLogsBtn = document.getElementById('clearLogs');
-const downloadLogs = document.getElementById('downloadLogs');
-const copyLogs = document.getElementById('copyLogs');
-const logMeta = document.getElementById('logMeta');
+      const modal = document.getElementById('modal');
+      const modalAccount = document.getElementById('modalAccount');
+      const modalConfirm = document.getElementById('modalConfirm');
+      const modalCancel = document.getElementById('modalCancel');
 
-// 初期 robots.txt の例
-robotsEditor.value = `User-agent: *
-Disallow: /private/
-Allow: /public/
+      // 表示
+      accountDisplay.textContent = username || '(未設定のユーザー名)';
+      sampleName.textContent = username || 'your.username';
 
-# 例: gstaticのロゴを禁止すると Search Console に警告が出ることがある
-# Disallow: /external/gstatic/`;
-
-// ログユーティリティ
-function log(line, level='info'){
-  const t = new Date().toLocaleTimeString();
-  const el = document.createElement('div');
-  el.textContent = `[${t}] ${line}`;
-  if(level==='err') el.style.color = '#ff9a9a';
-  if(level==='ok') el.style.color = '#9cf5b6';
-  logsEl.appendChild(el);
-  logsEl.scrollTop = logsEl.scrollHeight;
-  logMeta.textContent = `ログ数: ${logsEl.childNodes.length}`;
-}
-
-// 簡易 robots.txt パーサ（非常に簡易）
-function parseRobots(txt){
-  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const rules = [];
-  let currentAgents = [];
-  for(const l of lines){
-    if(l.startsWith('#')) continue;
-    const m = l.match(/^([^:]+):\s*(.*)$/);
-    if(!m) continue;
-    const key = m[1].trim().toLowerCase();
-    const val = m[2].trim();
-    if(key === 'user-agent'){
-      currentAgents = [val.toLowerCase()];
-      rules.push({agents: currentAgents, allow:[], disallow:[]});
-    } else if(key === 'disallow'){
-      if(rules.length===0) rules.push({agents:['*'],allow:[],disallow:[]});
-      rules[rules.length-1].disallow.push(val);
-    } else if(key === 'allow'){
-      if(rules.length===0) rules.push({agents:['*'],allow:[],disallow:[]});
-      rules[rules.length-1].allow.push(val);
-    } else {
-      // 無視
-    }
-  }
-  return rules;
-}
-
-// 判定: URL が robots.txt で許可されるか（簡易持ち分）
-function isAllowedByRobots(url, ua, rules){
-  // path 部分を判定
-  try {
-    const u = new URL(url, location.href);
-    const path = u.pathname + u.search;
-    // マッチルールを最長一致で処理（非常に簡易）
-    let applicable = {allow:[], disallow:[]};
-    for(const r of rules){
-      if(r.agents.some(a => a === '*' || ua.includes(a))){
-        applicable.allow.push(...r.allow);
-        applicable.disallow.push(...r.disallow);
+      function validate(){
+        confirmError.style.display = 'none';
+        const typed = confirmText.value.trim();
+        const passOk = passwordInput.value.trim().length > 0;
+        const typedMatches = typed.length > 0 && typed === username;
+        const acknowledged = ack.checked;
+        const enable = passOk && typedMatches && acknowledged;
+        deleteBtn.disabled = !enable;
+        deleteBtn.setAttribute('aria-disabled', String(!enable));
       }
-    }
-    // longest matching rule applies: if any disallow is exact prefix of path and longer than any allow -> disallow
-    let maxAllow = -1, maxDisallow = -1;
-    for(const a of applicable.allow){
-      if(a === '') continue;
-      if(path.startsWith(a) && a.length > maxAllow) maxAllow = a.length;
-    }
-    for(const d of applicable.disallow){
-      if(d === '') continue;
-      if(path.startsWith(d) && d.length > maxDisallow) maxDisallow = d.length;
-    }
-    // debug: console.log({path, maxAllow, maxDisallow});
-    if(maxDisallow > maxAllow) return false;
-    return true;
-  } catch(e){
-    return true;
-  }
-}
 
-// 擬似Fetch（SSE風ログを出す）
-async function simulateFetch(url, ua){
-  const abs = (new URL(url, location.href)).href;
-  previewTitle.innerHTML = `<strong>リソース:</strong> ${abs}`;
-  previewMeta.textContent = `User-Agent: ${ua} · Simulate fetch...`;
+      confirmText.addEventListener('input', validate);
+      passwordInput.addEventListener('input', validate);
+      ack.addEventListener('change', validate);
 
-  // 表示サムネは絶対パスに gstatic が含まれるとロゴ風に変える（デモ）
-  if(abs.includes('gstatic.com')){
-    previewImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMjg4QkY0IiByeD0i8i8iLz48dGV4dCB4PSIzMiIgeT0iMzYiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkdTVFA8L3RleHQ+PC9zdmc+';
-  } else {
-    previewImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMDMxNTRGIiByeD0i8i8iLz48dGV4dCB4PSIzMiIgeT0iMzYiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlJlc291cmNlPC90ZXh0Pjwvc3ZnPg==';
-  }
+      // クリックでモーダルを開いて最終確認
+      deleteBtn.addEventListener('click', function(){
+        const typed = confirmText.value.trim();
+        if(typed !== username){
+          confirmError.textContent = '入力したアカウント名が一致しません。正確に入力してください。';
+          confirmError.style.display = 'block';
+          return;
+        }
+        modalAccount.textContent = username;
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden','false');
+        // フォーカス移動
+        modalConfirm.focus();
+      });
 
-  // ステータス：ネットワーク遅延を模擬
-  const steps = [
-    {t: 300, msg: `DNS ルックアップ（${Math.floor(Math.random()*40)+10}ms）`},
-    {t: 120, msg: `TCP/TLS ハンドシェイク（${Math.floor(Math.random()*40)+20}ms）`},
-    {t: 400, msg: `リクエスト送信`},
-    {t: 600, msg: `バックエンド処理`},
-  ];
-  for(const s of steps){
-    log(s.msg);
-    await new Promise(r => setTimeout(r, s.t));
-  }
-  // レスポンス判定
-  // 1) robots.txt による拒否
-  const robotsRules = parseRobots(robotsEditor.value);
-  const allowed = isAllowedByRobots(url, ua, robotsRules);
-  if(!allowed){
-    log(`robots.txt によりブロックされました -> ${abs}`, 'err');
-    previewDecision.innerHTML = `<span style="color:var(--err)">判定: robots.txt によりブロック</span>`;
-    return {status:403, reason:'robots.txt blocked'};
-  }
+      function closeModal(){
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden','true');
+        deleteBtn.focus();
+      }
 
-  // 2) 外部リソースブロックオプション（デモ）
-  const u = new URL(abs, location.href);
-  if(simulateBlockedFetch.checked && u.hostname !== location.hostname){
-    log(`外部ドメイン ${u.hostname} は「外部リソースブロック」設定により拒否`, 'err');
-    previewDecision.innerHTML = `<span style="color:var(--err)">判定: 外部リソースとしてブロック</span>`;
-    return {status:403, reason:'external-block'};
-  }
+      modalCancel.addEventListener('click', closeModal);
 
-  // 3) 成功（SSE でチャンクを受信する風に表示）
-  log(`接続成功: ${abs}`, 'ok');
-  previewDecision.innerHTML = `<span style="color:var(--ok)">判定: 許可（フェッチ成功）</span>`;
+      // 最終的にフォームを送る
+      modalConfirm.addEventListener('click', function(){
+        // サーバー側でパスワード・CSRF・2FA を必ず検証すること
+        // ここでは通常のフォーム送信を行う
+        // 例えば、fetch() で API 呼び出しする場合はここで行う
+        const form = document.getElementById('deleteForm');
 
-  // SSE 風のチャンクを流す（デモ）
-  const chunks = [
-    'data: {"event":"meta","progress":10}\n\n',
-    'data: {"event":"meta","progress":40}\n\n',
-    'data: {"event":"image","chunk":1}\n\n',
-    'data: {"event":"meta","progress":80}\n\n',
-    'data: {"event":"complete","url":"'+abs+'"}\n\n'
-  ];
-  for(const c of chunks){
-    log('SSE受信: ' + c.replace(/\n/g,'|'));
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return {status:200, url:abs};
-}
+        // 見栄えのためにボタンを無効化
+        modalConfirm.disabled = true;
+        modalConfirm.textContent = '削除実行中...';
 
-// イベントバインド
-applyRobots.addEventListener('click', () => {
-  log('robots.txt を適用しました');
-});
+        // フォーム送信（通常のPOST） — 必要ならAJAXに置き換えても可
+        form.submit();
+      });
 
-presetBlocked.addEventListener('click', () => {
-  robotsEditor.value = `User-agent: *
-Disallow: /private/
-Disallow: /external/gstatic/
-Allow: /public/`;
-  log('プリセット: gstatic ロゴをブロックする設定を読み込みました');
-});
+      // モーダルをエスケープキーで閉じる
+      window.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && modal.style.display === 'flex'){
+          closeModal();
+        }
+      });
 
-testBtn.addEventListener('click', async () => {
-  const raw = testUrlInput.value.trim();
-  if(!raw){ alert('テストするURLを入れてください'); return; }
-  const ua = uaSelect.value;
-  log(`テスト開始 (${ua}) -> ${raw}`);
-  try {
-    await simulateFetch(raw, ua);
-  } catch(e) {
-    log('予期せぬエラー: ' + (e.message || e), 'err');
-  }
-});
-
-clearLogsBtn.addEventListener('click', () => {
-  logsEl.innerHTML = '';
-  logMeta.textContent = '空';
-});
-
-downloadLogs.addEventListener('click', () => {
-  const text = Array.from(logsEl.childNodes).map(n => n.textContent).join('\n');
-  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `googlebot-demo-logs-${Date.now()}.txt`;
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
-});
-
-copyLogs.addEventListener('click', () => {
-  const text = Array.from(logsEl.childNodes).map(n => n.textContent).join('\n');
-  navigator.clipboard?.writeText(text).then(()=>{
-    log('ログをクリップボードにコピーしました');
-  }).catch(()=> log('クリップボードに書けませんでした', 'err'));
-});
-
-// 初期ログ
-log('デモ開始。操作パネルで設定して「クロールをシミュレート」を押してください。');
-log('例: /api/images/generate-stream3 を入れてプリセットで gstatic をブロックすると Search Console の警告っぽくなるよ。');
-</script>
+      // 初回バリデート
+      validate();
+    })();
+  </script>
 </body>
 </html>
