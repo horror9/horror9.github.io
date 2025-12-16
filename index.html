@@ -3,242 +3,274 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>アカウント削除 — 確認</title>
+  <title>サンプルブログ — 山田太郎のメモ帳</title>
+  <meta name="description" content="シンプルでレスポンシブなブログテンプレート（ダークモード・検索付き）" />
   <style>
     :root{
-      --bg:#0f1724; --card:#0b1220; --accent:#ff5c5c;
-      --muted:#9aa4b2; --radius:12px; --gap:18px;
-      font-family: Inter, Roboto, "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
+      --bg:#f6f7f9; --card:#ffffff; --text:#111827; --muted:#6b7280;
+      --accent:#2563eb; --radius:12px;
+    }
+    [data-theme="dark"]{
+      --bg:#0b1020; --card:#0f1724; --text:#e6eef8; --muted:#9aa6bf; --accent:#60a5fa;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background:linear-gradient(180deg,#071021 0%, #0b1220 100%); color:#e6eef6;
-      padding:32px;
+      margin:0; font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background:linear-gradient(180deg,var(--bg), #ffffff 60%); color:var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;}
+
+    header{
+      display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px;
+    }
+    .site-brand{display:flex;gap:12px;align-items:center}
+    .logo{
+      width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,var(--accent), #7dd3fc); color:white;font-weight:700;font-size:18px;
+      box-shadow:0 6px 18px rgba(16,24,40,0.06);
+    }
+    .title{font-size:18px;font-weight:700}
+    nav a{margin-left:14px;color:var(--muted);text-decoration:none;font-size:14px}
+    .controls{display:flex;gap:8px;align-items:center}
+    .search{
+      padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);
+      background:var(--card); min-width:200px;
+    }
+    .btn{
+      background:var(--card); border:1px solid rgba(0,0,0,0.06); padding:8px 10px; border-radius:10px;
+      cursor:pointer; font-weight:600;
+    }
+
+    .hero{
+      background:var(--card); border-radius:var(--radius); padding:28px; margin-bottom:20px;
+      box-shadow:0 8px 30px rgba(2,6,23,0.06);
+    }
+    .hero h1{margin:0 0 6px 0;font-size:26px}
+    .hero p{margin:0;color:var(--muted)}
+
+    .posts{
+      display:grid; grid-template-columns: repeat(3, 1fr); gap:18px;
+      margin-top:18px;
     }
     .card{
-      width:100%; max-width:820px; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-      border-radius:var(--radius); padding:28px; box-shadow:0 8px 30px rgba(2,6,23,0.7);
-      border:1px solid rgba(255,255,255,0.03);
+      background:var(--card); border-radius:14px; overflow:hidden; display:flex;flex-direction:column;
+      box-shadow:0 6px 18px rgba(2,6,23,0.04); transition:transform .18s ease, box-shadow .18s ease;
     }
-    header{display:flex; align-items:center; gap:16px; margin-bottom:10px}
-    header h1{font-size:20px; margin:0}
-    p.lead{color:var(--muted); margin:6px 0 20px}
-    .grid{display:grid; grid-template-columns:1fr 360px; gap:var(--gap)}
-    @media (max-width:860px){ .grid{grid-template-columns:1fr; } .aside{order:2} }
-    .section{background:rgba(255,255,255,0.02); padding:18px; border-radius:10px; border:1px solid rgba(255,255,255,0.02)}
-    .field{margin-bottom:12px}
-    label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
-    input[type="password"], input[type="text"], textarea{
-      width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
-      background:transparent; color:inherit; font-size:15px;
+    .card:hover{transform:translateY(-6px); box-shadow:0 12px 40px rgba(2,6,23,0.08)}
+    .card .thumb{
+      height:140px; background:linear-gradient(120deg,#c7eaff,#fef3c7); display:flex;align-items:flex-end;
+      padding:12px;color:#0b1220;font-weight:700;font-size:14px;
     }
-    textarea{min-height:92px; resize:vertical}
-    .muted{font-size:13px; color:var(--muted)}
-    .danger{
-      background:linear-gradient(90deg, rgba(255,92,92,0.12), rgba(255,92,92,0.08));
-      border:1px solid rgba(255,92,92,0.14);
-      color:#ffdede;
-    }
-    .aside{display:flex; flex-direction:column; gap:12px; align-items:stretch}
-    .preview{padding:14px; border-radius:10px; background:rgba(255,255,255,0.012)}
-    .btn{
-      display:inline-block; padding:10px 14px; border-radius:10px; cursor:pointer;
-      border:0; font-weight:600; font-size:14px;
-    }
-    .btn.danger{background:var(--accent); color:white}
-    .btn.ghost{background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted)}
-    .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:8px}
-    .checkbox{display:flex; gap:10px; align-items:flex-start}
-    .tiny{font-size:13px;color:var(--muted)}
+    .card .body{padding:14px;display:flex;flex-direction:column;gap:10px;flex:1}
+    .meta{font-size:13px;color:var(--muted)}
+    .excerpt{flex:1;color:var(--text);line-height:1.5;font-size:14px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(0,0,0,0.04);color:var(--muted)}
+
+    .read{align-self:flex-start;padding:8px 12px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:700}
+
     /* modal */
-    .modal-backdrop{
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(2,6,23,0.6); z-index:60; padding:20px;
+    .modal{
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);padding:30px;
     }
-    .modal{width:100%; max-width:520px; background:var(--card); border-radius:12px; padding:20px; border:1px solid rgba(255,255,255,0.03)}
-    .modal h2{margin:0 0 6px}
-    .kbd{font-family:monospace; background:rgba(255,255,255,0.03); padding:2px 6px; border-radius:6px; font-size:13px}
-    .error{color:#ffb3b3; font-size:13px; margin-top:6px}
-    footer {margin-top:14px; color:var(--muted); font-size:13px}
-    /* accessibility focus */
-    :focus{outline:3px solid rgba(255,255,255,0.06); outline-offset:2px}
+    .modal.show{display:flex}
+    .modal .panel{max-width:800px;width:100%;background:var(--card);border-radius:12px;padding:20px;max-height:80vh;overflow:auto}
+    .modal .panel h2{margin-top:0}
+
+    footer{margin-top:26px;color:var(--muted);font-size:14px;padding-bottom:40px}
+
+    @media (max-width:900px){
+      .posts{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:600px){
+      header{flex-direction:column;align-items:stretch;gap:12px}
+      .posts{grid-template-columns:1fr}
+      .search{min-width:unset;width:100%}
+      .controls{justify-content:space-between}
+    }
   </style>
 </head>
 <body>
-  <!-- data-username は実際のユーザー名をサーバーから埋め込んでください -->
-  <main class="card" role="main" aria-labelledby="page-title" data-username="yamada.taro">
+  <div class="wrap" id="page">
     <header>
-      <svg width="36" height="36" viewBox="0 0 24 24" aria-hidden focusable="false"><circle cx="12" cy="12" r="10" fill="#1b2430"/><path d="M12 7v6" stroke="#ff5c5c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div>
-        <h1 id="page-title">アカウント削除</h1>
-        <p class="lead">アカウントを完全に削除すると、復元できません。データはすべて消去されます。</p>
+      <div class="site-brand">
+        <div class="logo">T</div>
+        <div>
+          <div class="title">山田太郎のメモ帳</div>
+          <div style="font-size:12px;color:var(--muted)">テーマ: 技術 / 日常 / 思考</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input class="search" id="search" placeholder="投稿を検索…" aria-label="投稿を検索" />
+        <button class="btn" id="toggleTheme" title="ダーク/ライト切替">ダーク切替</button>
       </div>
     </header>
 
-    <div class="grid" aria-live="polite">
-      <section class="section" aria-label="削除フォーム">
-        <form id="deleteForm" action="/delete-account" method="POST" novalidate>
-          <!-- サーバー側でCSRFトークンを埋め込んでください -->
-          <!-- <input type="hidden" name="csrf_token" value="{{csrf_token}}"> -->
+    <section class="hero" role="region" aria-label="イントロ">
+      <h1>短い読み物と技術メモをここに</h1>
+      <p>簡潔に書いて、すぐに読み切れる投稿だけを載せる。フィードはレスポンシブで、ダークモードをサポート。</p>
+    </section>
 
-          <div class="field">
-            <label>アカウント</label>
-            <div class="muted" id="accountNameDisplay" aria-live="polite"></div>
+    <main>
+      <section class="posts" id="posts">
+        <!-- Post 1 -->
+        <article class="card" data-title="はじめてのJavaScript">
+          <div class="thumb">Web / JavaScript</div>
+          <div class="body">
+            <div class="meta">2025-12-16 • 5分で読める</div>
+            <div class="excerpt">DOM の基本からイベント処理まで。小さな例で動きを確認しながら学ぶ入門メモ。</div>
+            <div class="tags">
+              <span class="tag">JavaScript</span>
+              <span class="tag">初心者向け</span>
+            </div>
+            <a class="read" href="#" data-post="1">続きを読む</a>
           </div>
+          <div class="full" hidden>
+            <h2>はじめてのJavaScript</h2>
+            <p>JavaScriptはブラウザ上で動くプログラミング言語だ。まずはコンソールログから始めよう。</p>
+            <pre><code>console.log('こんにちは、世界');</code></pre>
+            <p>次に DOM を触ってみる。document.querySelectorで要素を取って、テキストを置き換えるだけで反応が見える。</p>
+            <p>最後にイベントリスナでクリックや入力を扱えるようにしておくと便利。</p>
+          </div>
+        </article>
 
-          <div class="field">
-            <label for="password">パスワード（再確認のため）</label>
-            <input id="password" name="password" type="password" autocomplete="current-password" required aria-required="true" />
-            <div class="tiny muted">アカウント所有の確認のため、現在のパスワードを入力してください。</div>
+        <!-- Post 2 -->
+        <article class="card" data-title="効率的なメモ術">
+          <div class="thumb">Life / Productivity</div>
+          <div class="body">
+            <div class="meta">2025-11-02 • 3分で読める</div>
+            <div class="excerpt">メモは検索しやすく、短く。見返すこと前提の整理法を紹介。</div>
+            <div class="tags">
+              <span class="tag">生産性</span>
+              <span class="tag">メモ術</span>
+            </div>
+            <a class="read" href="#" data-post="2">続きを読む</a>
           </div>
+          <div class="full" hidden>
+            <h2>効率的なメモ術</h2>
+            <p>メモは「書く」より「見返す」前提で作る。タイトルを一行で要約し、タグを3つ以内にしておくと後で探しやすい。</p>
+            <ul>
+              <li>短いタイトル</li>
+              <li>日付を必ず入れる</li>
+              <li>タグは限定的に</li>
+            </ul>
+          </div>
+        </article>
 
-          <div class="field">
-            <label for="reason">削除理由（任意）</label>
-            <textarea id="reason" name="reason" placeholder="例: サービスを使わなくなった"></textarea>
+        <!-- Post 3 -->
+        <article class="card" data-title="CSSグリッドで作るレイアウト">
+          <div class="thumb">Web / CSS</div>
+          <div class="body">
+            <div class="meta">2025-08-19 • 4分で読める</div>
+            <div class="excerpt">grid-template-columns と auto-fill を使えば、柔軟なカードレイアウトが簡単に作れる。</div>
+            <div class="tags">
+              <span class="tag">CSS</span>
+              <span class="tag">レイアウト</span>
+            </div>
+            <a class="read" href="#" data-post="3">続きを読む</a>
           </div>
-
-          <div class="field">
-            <label for="confirmText">確認 — 以下を正確に入力してください</label>
-            <div class="tiny muted">アカウントを削除するには、あなたのアカウント名を正確に入力してください。</div>
-            <input id="confirmText" name="confirmText" type="text" placeholder="アカウント名を正確に入力" aria-describedby="confirmHelp" required />
-            <div id="confirmHelp" class="tiny muted">例: <span id="sampleName" class="kbd"></span></div>
-            <div id="confirmError" class="error" role="status" aria-live="polite" style="display:none"></div>
+          <div class="full" hidden>
+            <h2>CSSグリッドで作るレイアウト</h2>
+            <p>簡単な例：</p>
+            <pre><code>
+.container{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap:16px;
+}
+            </code></pre>
+            <p>レスポンシブに強く、カードレイアウトと相性が良い。</p>
           </div>
-
-          <div class="field checkbox">
-            <input id="ack" type="checkbox" />
-            <label for="ack" class="tiny">私はアカウントの削除が不可逆であることを理解しており、データが消去されることに同意します。</label>
-          </div>
-
-          <div class="actions">
-            <button type="button" id="cancelBtn" class="btn ghost" onclick="location.assign('/settings')">キャンセル</button>
-            <button type="button" id="deleteBtn" class="btn danger" disabled aria-disabled="true">アカウントを削除</button>
-          </div>
-        </form>
-        <footer>削除後はログイン不可。請求や支払いに関する情報も削除されます（必要に応じて別途処理が必要）。</footer>
+        </article>
       </section>
+    </main>
 
-      <aside class="aside" aria-label="確認サイドバー">
-        <div class="preview section danger" aria-hidden="false">
-          <strong>警告</strong>
-          <p class="muted">この操作は取り消せません。アカウント名とパスワードの両方を正しく入力する必要があります。</p>
-        </div>
-
-        <div class="section preview">
-          <strong>なにが消えるか</strong>
-          <ul class="tiny muted">
-            <li>プロフィールとパブリック情報</li>
-            <li>保存済みデータ（投稿、ファイル、設定など）</li>
-            <li>サブスクリプションは別途解約が必要な場合があります</li>
-          </ul>
-        </div>
-
-        <div class="section preview">
-          <strong>セキュリティ</strong>
-          <p class="tiny muted">サーバー側での再認証（例: メール確認、2段階認証）があると更に安全です。導入推奨。</p>
-        </div>
-      </aside>
-    </div>
-  </main>
-
-  <!-- モーダル -->
-  <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document" aria-labelledby="modalTitle">
-      <h2 id="modalTitle">最終確認 — 本当に削除しますか？</h2>
-      <p class="muted">アカウント: <span id="modalAccount" class="kbd"></span></p>
-      <p class="muted">この操作は永久にデータを削除します。復元はできません。</p>
-      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px">
-        <button id="modalCancel" class="btn ghost">やめる</button>
-        <button id="modalConfirm" class="btn danger">完全に削除する</button>
+    <!-- Modal for full post -->
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="panel" role="document">
+        <button class="btn" id="closeModal" style="float:right;margin-left:8px;">閉じる</button>
+        <div id="modalContent"></div>
       </div>
     </div>
+
+    <footer>
+      © <span id="year"></span> 山田太郎 — 思いつきと備忘録。ソースは自由に改変して構わない。
+    </footer>
   </div>
 
   <script>
-    (function(){
-      const main = document.querySelector('main');
-      const username = main.dataset.username || ''; // サーバーで埋めること（安全）
-      const accountDisplay = document.getElementById('accountNameDisplay');
-      const sampleName = document.getElementById('sampleName');
-      const confirmText = document.getElementById('confirmText');
-      const ack = document.getElementById('ack');
-      const deleteBtn = document.getElementById('deleteBtn');
-      const passwordInput = document.getElementById('password');
-      const confirmError = document.getElementById('confirmError');
+    // 初期化
+    const root = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if(stored === 'dark') root.setAttribute('data-theme','dark');
 
-      const modal = document.getElementById('modal');
-      const modalAccount = document.getElementById('modalAccount');
-      const modalConfirm = document.getElementById('modalConfirm');
-      const modalCancel = document.getElementById('modalCancel');
+    // 年表示
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-      // 表示
-      accountDisplay.textContent = username || '(未設定のユーザー名)';
-      sampleName.textContent = username || 'your.username';
-
-      function validate(){
-        confirmError.style.display = 'none';
-        const typed = confirmText.value.trim();
-        const passOk = passwordInput.value.trim().length > 0;
-        const typedMatches = typed.length > 0 && typed === username;
-        const acknowledged = ack.checked;
-        const enable = passOk && typedMatches && acknowledged;
-        deleteBtn.disabled = !enable;
-        deleteBtn.setAttribute('aria-disabled', String(!enable));
+    // ダークモード切替
+    document.getElementById('toggleTheme').addEventListener('click', ()=>{
+      if(root.getAttribute('data-theme') === 'dark'){
+        root.removeAttribute('data-theme');
+        localStorage.setItem('theme','light');
+      } else {
+        root.setAttribute('data-theme','dark');
+        localStorage.setItem('theme','dark');
       }
+    });
 
-      confirmText.addEventListener('input', validate);
-      passwordInput.addEventListener('input', validate);
-      ack.addEventListener('change', validate);
-
-      // クリックでモーダルを開いて最終確認
-      deleteBtn.addEventListener('click', function(){
-        const typed = confirmText.value.trim();
-        if(typed !== username){
-          confirmError.textContent = '入力したアカウント名が一致しません。正確に入力してください。';
-          confirmError.style.display = 'block';
-          return;
-        }
-        modalAccount.textContent = username;
-        modal.style.display = 'flex';
+    // モーダル表示
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    document.querySelectorAll('.read').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const card = btn.closest('.card');
+        const full = card.querySelector('.full').innerHTML;
+        modalContent.innerHTML = full;
+        modal.classList.add('show');
         modal.setAttribute('aria-hidden','false');
-        // フォーカス移動
-        modalConfirm.focus();
+        window.scrollTo({top:0,behavior:'smooth'});
       });
-
-      function closeModal(){
-        modal.style.display = 'none';
+    });
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+    });
+    modal.addEventListener('click', (e)=>{
+      if(e.target === modal){
+        modal.classList.remove('show');
         modal.setAttribute('aria-hidden','true');
-        deleteBtn.focus();
       }
+    });
 
-      modalCancel.addEventListener('click', closeModal);
-
-      // 最終的にフォームを送る
-      modalConfirm.addEventListener('click', function(){
-        // サーバー側でパスワード・CSRF・2FA を必ず検証すること
-        // ここでは通常のフォーム送信を行う
-        // 例えば、fetch() で API 呼び出しする場合はここで行う
-        const form = document.getElementById('deleteForm');
-
-        // 見栄えのためにボタンを無効化
-        modalConfirm.disabled = true;
-        modalConfirm.textContent = '削除実行中...';
-
-        // フォーム送信（通常のPOST） — 必要ならAJAXに置き換えても可
-        form.submit();
-      });
-
-      // モーダルをエスケープキーで閉じる
-      window.addEventListener('keydown', function(e){
-        if(e.key === 'Escape' && modal.style.display === 'flex'){
-          closeModal();
+    // 検索フィルター（タイトルと抜粋を参照）
+    const search = document.getElementById('search');
+    const posts = Array.from(document.querySelectorAll('.card'));
+    search.addEventListener('input', ()=>{
+      const q = search.value.trim().toLowerCase();
+      posts.forEach(p=>{
+        const title = p.dataset.title.toLowerCase();
+        const excerpt = p.querySelector('.excerpt').textContent.toLowerCase();
+        if(!q || title.includes(q) || excerpt.includes(q)){
+          p.style.display = '';
+        } else {
+          p.style.display = 'none';
         }
       });
+    });
 
-      // 初回バリデート
-      validate();
-    })();
+    // キーボード操作: Escでモーダル閉じる
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && modal.classList.contains('show')){
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden','true');
+      }
+    });
   </script>
 </body>
 </html>
