@@ -1,88 +1,297 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>About — Qian-4 GitHub Pages</title>
-  <meta name="description" content="Qian-4 GitHub Pages の About ページです。サイトや作者について紹介します。">
-  <link rel="canonical" href="https://qian-4.github.io/about/">
-  <meta name="robots" content="index,follow">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="香港紹介 — 文化、観光名所、グルメ、アクセス情報を日本語で分かりやすく紹介します。" />
+  <meta property="og:title" content="香港紹介 — アジアの世界都市" />
+  <meta property="og:description" content="香港の見どころ、文化、食、アクセス情報をまとめた日本語の紹介ページ。" />
+  <meta property="og:image" content="https://source.unsplash.com/1600x900/?hong-kong,skyline" />
+  <title>香港紹介 — アジアの世界都市</title>
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="About — Qian-4 GitHub Pages">
-  <meta property="og:description" content="Qian-4 GitHub Pages の About ページです。サイトや作者について紹介します。">
-  <meta property="og:url" content="https://qian-4.github.io/about/">
-  <meta property="og:site_name" content="Qian-4 GitHub Pages">
+  <!-- フォント（オプション） -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <!-- JSON-LD構造化データ -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "url": "https://qian-4.github.io/about/",
-    "name": "About — Qian-4 GitHub Pages",
-    "isPartOf": {
-      "@type": "WebSite",
-      "url": "https://qian-4.github.io/"
-    }
-  }
-  </script>
-
-  <!-- 内部CSS -->
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    html,body{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;color:#111;line-height:1.6;background:#fff;}
-    header{background:#f9f9f9;padding:1rem;border-bottom:1px solid #ddd;}
-    nav a{margin-right:1rem;text-decoration:none;color:#333;font-weight:500;}
-    nav a:hover{color:#0070f3;}
-    main{max-width:900px;margin:2rem auto;padding:0 1rem;}
-    h1,h2,h3{margin-bottom:0.5rem;color:#111;}
-    h2{margin-top:1.5rem;}
-    p,li{margin-bottom:0.8rem;}
-    ul{margin-left:1.2rem;list-style-type: disc;}
-    footer{text-align:center;padding:1rem;background:#f9f9f9;border-top:1px solid #ddd;margin-top:2rem;font-size:0.9rem;color:#555;}
+    :root{
+      --accent:#c8102e;
+      --muted:#6b6b6b;
+      --bg:#f7f7f9;
+      --maxw:1100px;
+      --radius:10px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      background:var(--bg);
+      color:#111;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ヘッダー / ナビ */
+    header.site-header{
+      background:var(--accent);
+      color:#fff;
+      padding:28px 16px;
+      text-align:center;
+    }
+    header .brand{
+      font-size:1.5rem;
+      font-weight:700;
+      letter-spacing:0.04em;
+      margin:0;
+    }
+    nav.main-nav{
+      background:#fff;
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      padding:12px 16px;
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      position:sticky;
+      top:0;
+      z-index:50;
+    }
+    nav.main-nav a{
+      color:var(--accent);
+      text-decoration:none;
+      font-weight:600;
+      padding:6px 8px;
+      border-radius:6px;
+    }
+    nav.main-nav a:hover{background:rgba(200,16,46,0.06)}
+
+    /* ヒーロー */
+    .hero{
+      max-width:var(--maxw);
+      margin:24px auto;
+      overflow:hidden;
+      border-radius:var(--radius);
+      background:#fff;
+      display:grid;
+      grid-template-columns:1fr;
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    }
+    .hero .hero-media{
+      min-height:220px;
+      background-image:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.25)), url("https://source.unsplash.com/1600x900/?hong-kong,harbour");
+      background-size:cover;
+      background-position:center;
+    }
+    .hero .hero-body{
+      padding:20px 24px;
+    }
+    .hero h1{margin:0 0 6px;font-size:1.6rem;color:var(--accent)}
+    .hero p.lead{margin:0;color:var(--muted)}
+
+    /* レイアウト */
+    main.container{
+      max-width:var(--maxw);
+      margin:22px auto;
+      padding:0 18px 40px;
+      display:grid;
+      grid-template-columns: 2fr 1fr;
+      gap:20px;
+    }
+    @media (max-width:900px){
+      main.container{grid-template-columns:1fr}
+      .hero .hero-media{min-height:180px}
+    }
+
+    /* コンテンツカード */
+    .card{
+      background:#fff;
+      border-radius:10px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    }
+    .card h2{margin-top:0;color:var(--accent)}
+    ul.simple{padding-left:1.1rem;margin:8px 0}
+    ul.simple li{margin:6px 0}
+
+    /* サイドバー要素 */
+    aside .small{
+      font-size:0.95rem;
+      color:var(--muted);
+    }
+    .attractions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .attractions .place{
+      background:linear-gradient(180deg,#fff,#fafafa);
+      border:1px solid rgba(0,0,0,0.04);
+      padding:10px;
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.95rem;
+    }
+
+    /* フォーム（モック） */
+    form.contact{display:flex;flex-direction:column;gap:8px}
+    form input, form textarea{
+      padding:10px;border-radius:8px;border:1px solid #e6e6e9;font-size:0.95rem;
+      resize:vertical;
+    }
+    form button{
+      background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:8px;font-weight:700;cursor:pointer;
+    }
+    form button:hover{opacity:0.95}
+
+    /* フッター */
+    footer.site-footer{
+      margin-top:26px;
+      padding:20px 18px;
+      background:#111;
+      color:#ddd;
+      text-align:center;
+      font-size:0.9rem;
+    }
+
+    /* 小さめのユーティリティ */
+    .muted{color:var(--muted)}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .tag{background:#f1f1f3;padding:6px 8px;border-radius:999px;font-size:0.85rem;color:#333}
+    .map-embed{width:100%;height:220px;border-radius:8px;border:0}
   </style>
 </head>
 <body>
 
-  <header>
-    <nav>
-      <a href="/">ホーム</a>
-      <a href="/about/">About</a>
-      <a href="/contact/">Contact</a>
-    </nav>
+  <header class="site-header">
+    <div class="brand">香港紹介 — アジアの世界都市</div>
+    <div class="muted" style="font-size:0.95rem;margin-top:6px">文化とモダニズムが混じり合う街。簡潔で見やすい紹介ページ（模擬）</div>
   </header>
 
-  <main>
-    <article itemscope itemtype="https://schema.org/Article">
-      <h1 itemprop="headline">About — Qian-4 GitHub Pages</h1>
-      <p>このページでは、Qian-4 GitHub Pages サイトや作者について紹介します。サイトの目的や内容を簡潔に書くと、検索エンジンに評価されやすくなります。</p>
+  <nav class="main-nav" aria-label="主要ナビゲーション">
+    <a href="#about">概要</a>
+    <a href="#culture">文化</a>
+    <a href="#attractions">見どころ</a>
+    <a href="#access">アクセス</a>
+    <a href="#contact">お問い合わせ</a>
+  </nav>
 
-      <h2>サイトについて</h2>
-      <p>このサイトは GitHub Pages 上で動作する静的サイトです。モバイルフレンドリーで、インデックスされやすい構造を意識しています。</p>
+  <section class="hero">
+    <div class="hero-media" role="img" aria-label="香港の夜景"></div>
+    <div class="hero-body">
+      <h1>香港 — 伝統と現代の交差点</h1>
+      <p class="lead">港町のスカイライン、活気あるストリートフード、歴史ある寺院。短い滞在でも見どころの多い街です。</p>
+    </div>
+  </section>
 
-      <h2>作者について</h2>
-      <p>作者は Qian-4 として活動しており、Web 技術や情報整理を中心に情報を発信しています。</p>
+  <main class="container" role="main">
+    <div>
+      <article class="card" id="about" aria-labelledby="about-title">
+        <h2 id="about-title">香港について</h2>
+        <p>香港は中国南部の沿岸に位置し、国際金融と港湾のハブとして発展しました。小さな面積に多彩な景観が凝縮され、ビクトリア・ハーバーを中心に高層ビル群や歴史的な下町が共存します。</p>
 
-      <h2>特徴</h2>
-      <ul>
-        <li>内部CSSのみで完結</li>
-        <li>モバイルフレンドリー</li>
-        <li>構造化データ(JSON-LD)対応</li>
-        <li>内部リンクを活用してクロールしやすい</li>
-      </ul>
-    </article>
+        <h3 style="margin-top:16px">一言で見る香港</h3>
+        <div class="tags" aria-hidden="false">
+          <span class="tag">多言語（広東語 / 英語 / 中国語）</span>
+          <span class="tag">グローバル金融</span>
+          <span class="tag">ストリートフード</span>
+          <span class="tag">ナイトマーケット</span>
+        </div>
+      </article>
+
+      <article class="card" id="culture" style="margin-top:16px" aria-labelledby="culture-title">
+        <h2 id="culture-title">文化と食</h2>
+        <p>伝統的な広東料理、点心、茶文化が根付く一方で、国際的なレストランや現代アートも盛んです。祭りや季節行事も多彩で、街角には古い寺や街市（マーケット）が残ります。</p>
+        <h4 style="margin-top:12px">おすすめグルメ</h4>
+        <ul class="simple">
+          <li>点心（飲茶）</li>
+          <li>魚蛋（フィッシュボール）や燒味（ローストミート）</li>
+          <li>香港式ミルクティーと菠蘿包（パイナップルパン）</li>
+        </ul>
+      </article>
+
+      <article class="card" id="attractions" style="margin-top:16px" aria-labelledby="attr-title">
+        <h2 id="attr-title">主な見どころ</h2>
+        <p class="muted">短時間でも押さえておきたい代表スポット</p>
+        <ul class="simple">
+          <li><strong>太平山頂（ヴィクトリア・ピーク）</strong> — 香港島の展望台。夜景が特に美しい。</li>
+          <li><strong>尖沙咀（チムサーチョイ）</strong> — ショッピング街とプロムナード、香港文化中心。</li>
+          <li><strong>旺角・女人街</strong> — ナイトマーケットとストリートフードの宝庫。</li>
+          <li><strong>ランタオ島・天壇大仏</strong> — 自然と宗教的名所、トレッキングも楽しめる。</li>
+        </ul>
+
+        <div style="margin-top:12px">
+          <strong class="muted">家族向け</strong>
+          <div class="attractions" aria-hidden="false">
+            <div class="place">ディズニーランド</div>
+            <div class="place">海洋公園</div>
+            <div class="place">ビクトリア・ハーバーのスターフェリー</div>
+            <div class="place">サイクリングと海辺プロムナード</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="access" style="margin-top:16px" aria-labelledby="access-title">
+        <h2 id="access-title">アクセスと移動</h2>
+        <p>香港国際空港（HKG）は世界的なハブ空港で、空港から市内へはエアポートエクスプレス、バス、タクシーが利用可能。市内移動はMTR（地下鉄）が非常に便利で、オクトパスカードというプリペイド交通カードが使えます。</p>
+
+        <h4 style="margin-top:10px">便利なヒント</h4>
+        <ul class="simple">
+          <li>オクトパスカードは交通以外でもコンビニや自動販売機で使える。</li>
+          <li>主要駅の英語表示は整備されているが、路地では広東語の表示が多い。</li>
+          <li>タクシーは色でエリアが分かれている（赤＝香港島・九龍など）。</li>
+        </ul>
+
+        <div style="margin-top:12px">
+          <iframe class="map-embed" title="Hong Kong map" src="https://www.google.com/maps?q=Hong+Kong&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </article>
+
+    </div>
+
+    <aside>
+      <section class="card" aria-labelledby="quick-title">
+        <h3 id="quick-title">クイック情報</h3>
+        <p class="small"><strong>公用語：</strong> 広東語・英語（中国語（普通話）も多く使用）</p>
+        <p class="small"><strong>通貨：</strong> 香港ドル (HKD)</p>
+        <p class="small"><strong>ベストシーズン：</strong> 10月〜12月（比較的涼しく過ごしやすい）</p>
+
+        <div style="margin-top:10px">
+          <h4 style="margin-bottom:6px">人気エリア</h4>
+          <div class="attractions" aria-hidden="false">
+            <div class="place">中環</div>
+            <div class="place">尖沙咀</div>
+            <div class="place">旺角</div>
+            <div class="place">九龍城</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px" aria-labelledby="contact-title">
+        <h3 id="contact-title">お問い合わせ（モック）</h3>
+        <p class="small">下は送信テスト用のフォーム。実運用する場合はサーバー側の受信処理を実装してください。</p>
+        <form class="contact" action="#" method="post" onsubmit="alert('このフォームはモックです。実際の送信処理は実装されていません。'); return false;" aria-label="お問い合わせフォーム">
+          <label><span class="muted">お名前</span>
+            <input type="text" name="name" placeholder="例：田中 太郎" required>
+          </label>
+          <label><span class="muted">メールアドレス</span>
+            <input type="email" name="email" placeholder="you@example.com" required>
+          </label>
+          <label><span class="muted">メッセージ</span>
+            <textarea name="message" rows="4" placeholder="ご質問やご要望をどうぞ"></textarea>
+          </label>
+          <button type="submit">送信（モック）</button>
+        </form>
+      </section>
+
+      <section class="card" style="margin-top:16px" aria-labelledby="notes-title">
+        <h3 id="notes-title">注意</h3>
+        <p class="small">このページは紹介用のサンプルです。表示や表現は実情と異なる場合があります。旅行や手続きに関する最新情報は公式情報を確認してください。</p>
+      </section>
+    </aside>
   </main>
 
-  <footer>
-    <p>&copy; <span id="year">2025</span> Qian-4 GitHub Pages</p>
+  <footer class="site-footer">
+    © 2025 香港紹介（模擬ページ） — コンテンツは参考情報です
   </footer>
-
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-
 </body>
 </html>
